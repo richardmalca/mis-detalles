@@ -100,6 +100,10 @@ interface SolarPlanetProps {
     tiltZ: number;
   };
   spinSpeed: number;
+  orbitRadius?: number;
+  orbitSpeed?: number;
+  bobAmount?: number;
+  bobSpeed?: number;
 }
 
 function SolarPlanet({
@@ -112,20 +116,32 @@ function SolarPlanet({
   atmosphereColor = "#93c5fd",
   ring,
   spinSpeed,
+  orbitRadius = 1.4,
+  orbitSpeed = 0.06,
+  bobAmount = 0.6,
+  bobSpeed = 0.15,
 }: SolarPlanetProps) {
   const groupRef = useRef<THREE.Group>(null);
   const meshRef = useRef<THREE.Mesh>(null);
+  const baseX = initialPos[0];
+  const baseY = initialPos[1];
   const baseZ = initialPos[2];
+  const orbitOffset = useRef(Math.random() * Math.PI * 2);
 
-  useFrame(({ camera }, delta) => {
+  useFrame(({ camera, clock }, delta) => {
     if (meshRef.current) {
       meshRef.current.rotation.y += delta * spinSpeed;
     }
 
     if (groupRef.current) {
+      const t = clock.getElapsedTime() + orbitOffset.current;
       const distanceFactor = Math.abs(baseZ);
       const parallax = (camera.position.z - 5) * (18 / distanceFactor);
-      groupRef.current.position.z = baseZ + parallax * 0.2;
+
+      groupRef.current.position.x = baseX + Math.cos(t * orbitSpeed) * orbitRadius;
+      groupRef.current.position.y =
+        baseY + Math.sin(t * bobSpeed) * bobAmount + Math.sin(t * orbitSpeed) * orbitRadius * 0.4;
+      groupRef.current.position.z = baseZ + parallax * 0.2 + Math.cos(t * bobSpeed * 0.7) * 0.8;
     }
   });
 
@@ -189,6 +205,10 @@ export function Planets() {
         hasAtmosphere={true}
         atmosphereColor="#60a5fa"
         spinSpeed={0.06}
+        orbitRadius={1.1}
+        orbitSpeed={0.09}
+        bobAmount={0.5}
+        bobSpeed={0.2}
       />
 
       <SolarPlanet
@@ -198,6 +218,10 @@ export function Planets() {
         baseColor="#c1440e"
         roughness={0.95}
         spinSpeed={0.055}
+        orbitRadius={1.4}
+        orbitSpeed={0.11}
+        bobAmount={0.6}
+        bobSpeed={0.24}
       />
 
       <SolarPlanet
@@ -208,6 +232,10 @@ export function Planets() {
         texture={jupiterTex}
         roughness={0.65}
         spinSpeed={0.16}
+        orbitRadius={2.2}
+        orbitSpeed={0.04}
+        bobAmount={0.9}
+        bobSpeed={0.1}
       />
 
       <SolarPlanet
@@ -225,6 +253,10 @@ export function Planets() {
           tiltZ: THREE.MathUtils.degToRad(12),
         }}
         spinSpeed={0.13}
+        orbitRadius={1.8}
+        orbitSpeed={0.05}
+        bobAmount={0.8}
+        bobSpeed={0.13}
       />
 
       <SolarPlanet
@@ -242,6 +274,10 @@ export function Planets() {
           tiltZ: 0,
         }}
         spinSpeed={0.09}
+        orbitRadius={1.6}
+        orbitSpeed={0.07}
+        bobAmount={0.7}
+        bobSpeed={0.18}
       />
 
       <SolarPlanet
@@ -251,6 +287,10 @@ export function Planets() {
         baseColor="#3457a6"
         roughness={0.6}
         spinSpeed={0.08}
+        orbitRadius={1.5}
+        orbitSpeed={0.06}
+        bobAmount={0.7}
+        bobSpeed={0.16}
       />
     </>
   );

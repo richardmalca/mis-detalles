@@ -45,8 +45,10 @@ export function AnimatedFlower({
                 rx="11"
                 ry="20"
                 fill={i % 2 === 0 ? petalColor : petalColorAlt}
+                className="petal-bloom"
                 style={{
                   transformOrigin: "50px 50px",
+                  animationDelay: `${delay + i * 0.06}s`,
                 }}
               />
             </g>
@@ -56,7 +58,8 @@ export function AnimatedFlower({
             cy="50"
             r="13"
             fill={centerColor}
-            style={{ transformOrigin: "50px 50px" }}
+            className="petal-bloom"
+            style={{ transformOrigin: "50px 50px", animationDelay: `${delay}s` }}
           />
         </g>
       </svg>
