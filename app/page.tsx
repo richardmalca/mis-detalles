@@ -12,15 +12,15 @@ export default function Home() {
     <main className="relative h-screen w-screen overflow-hidden bg-black select-none">
       <GalaxyExperience />
 
-      <div className="absolute top-4 left-1/2 -translate-x-1/2 z-30 pointer-events-auto sm:top-6">
+      <div className="absolute bottom-4 left-4 z-30 pointer-events-auto sm:bottom-6 sm:left-6">
         <button
           onClick={() => setShowGenerator(!showGenerator)}
-          className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-zinc-950/85 px-3.5 py-1.5 text-[11px] sm:text-xs font-bold text-amber-300 shadow-2xl backdrop-blur-xl transition-all hover:bg-amber-400/10 hover:border-amber-300 active:scale-95 whitespace-nowrap"
+          className="flex items-center gap-1.5 rounded-full border border-amber-400/40 bg-zinc-950/90 px-3.5 py-2 text-xs font-bold text-amber-300 shadow-2xl backdrop-blur-xl transition-all hover:bg-amber-400/10 hover:border-amber-300 active:scale-95 whitespace-nowrap"
         >
           {showGenerator ? (
             <>
               <X className="h-3.5 w-3.5" />
-              <span>Cerrar creador</span>
+              <span>Cerrar</span>
             </>
           ) : (
             <>

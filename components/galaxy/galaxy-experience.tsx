@@ -89,16 +89,16 @@ export function GalaxyExperience() {
         onWheel={handleWheel}
       />
 
-      <header className="absolute left-6 top-6 z-20 pointer-events-auto flex items-center gap-3">
-        <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-white/15 bg-zinc-950/80 shadow-2xl backdrop-blur-xl">
-          <Heart className="h-5 w-5 text-pink-400 fill-pink-500/20" />
+      <header className="absolute left-4 top-4 sm:left-6 sm:top-6 z-20 pointer-events-auto flex items-center gap-2.5">
+        <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-2xl border border-white/15 bg-zinc-950/80 shadow-2xl backdrop-blur-xl">
+          <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-pink-400 fill-pink-500/20" />
         </div>
         <div>
-          <h1 className="text-lg font-bold tracking-tight text-white sm:text-xl drop-shadow-md">
+          <h1 className="text-base sm:text-xl font-bold tracking-tight text-white drop-shadow-md">
             Mis Detalles
           </h1>
-          <p className="text-xs font-medium text-zinc-300">
-            Nuestro cosmos de recuerdos compartidos
+          <p className="text-[10px] sm:text-xs font-medium text-zinc-400">
+            Cosmos de recuerdos compartidos
           </p>
         </div>
       </header>
