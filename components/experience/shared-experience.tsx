@@ -7,8 +7,7 @@ import { RevealSection } from "./reveal-section";
 import { LeaveMessageForm } from "./leave-message-form";
 import { AnimatedFlower } from "./animated-flower";
 import { UniverseCanvas } from "./universe-canvas";
-import Link from "next/link";
-import { ArrowLeft, Sparkles, ChevronDown } from "lucide-react";
+import { Sparkles, ChevronDown } from "lucide-react";
 
 export function SharedExperience({
   recipientName,
@@ -55,16 +54,6 @@ export function SharedExperience({
   return (
     <div className="relative min-h-screen w-full text-white selection:bg-amber-500/30">
       <UniverseCanvas speedRef={speedRef} coreIntensityRef={coreIntensityRef} />
-
-      <header className="fixed top-3 left-3 sm:top-4 sm:left-4 z-40 flex items-center gap-2">
-        <Link
-          href="/"
-          className="flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-950/80 px-3 py-1.5 text-xs text-zinc-300 backdrop-blur-md transition-colors hover:bg-white/10 hover:text-white"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          <span className="hidden xs:inline">Volver al cosmos</span>
-        </Link>
-      </header>
 
       {!opened && (
         <OpeningCard
