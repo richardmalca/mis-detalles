@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { getExperienceContent, ExperienceKind } from "@/lib/content";
+import { supabase } from "@/lib/supabase";
 import { OpeningCard } from "./opening-card";
 import { RevealSection } from "./reveal-section";
 import { LeaveMessageForm } from "./leave-message-form";
@@ -12,14 +13,17 @@ import { Sparkles, ChevronDown } from "lucide-react";
 export function SharedExperience({
   recipientName,
   kind,
+  code,
 }: {
   recipientName: string;
   kind: ExperienceKind;
+  code: string;
 }) {
   const [opened, setOpened] = useState(false);
   const content = getExperienceContent(kind, recipientName);
   const speedRef = useRef(0.4);
   const coreIntensityRef = useRef(0.001);
+  const hasMarkedComplete = useRef(false);
 
   useEffect(() => {
     document.body.style.overflow = opened ? "" : "hidden";
@@ -27,6 +31,17 @@ export function SharedExperience({
       document.body.style.overflow = "";
     };
   }, [opened]);
+
+  function handleOpen() {
+    setOpened(true);
+    supabase.rpc("mark_link_opened", { p_code: code }).then(() => {});
+  }
+
+  function handleReachEnd() {
+    if (hasMarkedComplete.current) return;
+    hasMarkedComplete.current = true;
+    supabase.rpc("mark_link_completed", { p_code: code }).then(() => {});
+  }
 
   useEffect(() => {
     let raf = 0;
@@ -56,10 +71,7 @@ export function SharedExperience({
       <UniverseCanvas speedRef={speedRef} coreIntensityRef={coreIntensityRef} />
 
       {!opened && (
-        <OpeningCard
-          recipientName={recipientName}
-          onOpen={() => setOpened(true)}
-        />
+        <OpeningCard recipientName={recipientName} onOpen={handleOpen} />
       )}
 
       {opened && (
@@ -100,7 +112,7 @@ export function SharedExperience({
             </RevealSection>
           ))}
 
-          <RevealSection className="min-h-[95vh]">
+          <RevealSection className="min-h-[95vh]" onVisible={handleReachEnd}>
             <div className="flex w-full max-w-md flex-col items-center gap-6 text-center pb-16">
               <AnimatedFlower size={56} />
 

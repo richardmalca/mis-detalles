@@ -65,7 +65,9 @@ export default async function ExperienciaPage({ params }: ExperienciaPageProps) 
     const kind: ExperienceKind = linkData.kind === "amistad" ? "amistad" : "amor";
     const recipientName = linkData.recipient_name || "Ti";
 
-    return <SharedExperience recipientName={recipientName} kind={kind} />;
+    return (
+      <SharedExperience recipientName={recipientName} kind={kind} code={code} />
+    );
   } catch {
     return <NotFoundCard />;
   }

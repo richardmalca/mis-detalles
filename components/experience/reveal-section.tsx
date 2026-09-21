@@ -6,9 +6,11 @@ import type { ReactNode } from "react";
 export function RevealSection({
   children,
   className = "",
+  onVisible,
 }: {
   children: ReactNode;
   className?: string;
+  onVisible?: () => void;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
@@ -17,11 +19,15 @@ export function RevealSection({
     const el = ref.current;
     if (!el) return;
     const observer = new IntersectionObserver(
-      ([entry]) => setVisible(entry.isIntersecting),
+      ([entry]) => {
+        setVisible(entry.isIntersecting);
+        if (entry.isIntersecting) onVisible?.();
+      },
       { threshold: 0.4 }
     );
     observer.observe(el);
     return () => observer.disconnect();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

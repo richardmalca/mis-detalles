@@ -3,8 +3,9 @@
 import { useState } from "react";
 import { AnimatedFlower } from "./animated-flower";
 import { supabase } from "@/lib/supabase";
+import { ensureCreator } from "@/lib/creator";
 import { ExperienceKind } from "@/lib/content";
-import { Sparkles, Copy, Check, Heart, Users, ExternalLink } from "lucide-react";
+import { Sparkles, Copy, Check, Heart, Users, ExternalLink, KeyRound } from "lucide-react";
 import Link from "next/link";
 
 export function LinkGenerator() {
@@ -13,6 +14,8 @@ export function LinkGenerator() {
   const [link, setLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
+  const [myPin, setMyPin] = useState<string | null>(null);
+  const [pinCopied, setPinCopied] = useState(false);
 
   async function handleGenerate() {
     if (!name.trim()) return;
@@ -20,9 +23,17 @@ export function LinkGenerator() {
     setLink(null);
 
     try {
+      const creator = await ensureCreator();
+      if (!creator) {
+        setStatus("error");
+        return;
+      }
+      setMyPin(creator.pin);
+
       const { data, error } = await supabase.rpc("create_love_link", {
         p_name: name.trim(),
         p_kind: kind,
+        p_creator_id: creator.id,
       });
 
       if (error || !data) {
@@ -36,6 +47,13 @@ export function LinkGenerator() {
     } catch {
       setStatus("error");
     }
+  }
+
+  async function handleCopyPin() {
+    if (!myPin) return;
+    await navigator.clipboard.writeText(myPin);
+    setPinCopied(true);
+    setTimeout(() => setPinCopied(false), 2500);
   }
 
   async function handleCopy() {
@@ -133,6 +151,35 @@ export function LinkGenerator() {
             {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
             {copied ? "¡Copiado al portapapeles!" : "Copiar enlace"}
           </button>
+        </div>
+      )}
+
+      {myPin && (
+        <div className="flex w-full flex-col gap-2 rounded-2xl border border-indigo-400/30 bg-indigo-500/10 p-4">
+          <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-300">
+            <KeyRound className="h-3.5 w-3.5" />
+            Tu PIN para ver tus links
+          </div>
+          <p className="text-xs text-zinc-300">
+            Guárdalo: con este PIN entras a <span className="font-semibold text-white">Mi panel</span> y ves
+            solo los links que tú generaste, nadie más.
+          </p>
+          <div className="flex items-center justify-between rounded-xl bg-black/40 px-4 py-2">
+            <span className="font-mono text-lg tracking-[0.3em] text-white">{myPin}</span>
+            <button
+              onClick={handleCopyPin}
+              className="flex items-center gap-1 text-xs text-indigo-200 hover:text-white"
+            >
+              {pinCopied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+              {pinCopied ? "Copiado" : "Copiar"}
+            </button>
+          </div>
+          <Link
+            href="/mi-panel"
+            className="mt-1 text-center text-xs text-indigo-200 underline hover:text-white"
+          >
+            Ir a Mi panel
+          </Link>
         </div>
       )}
     </div>
