@@ -15,31 +15,31 @@ export function Core({ intensityRef }: { intensityRef: MutableRefObject<number> 
     const pulse = 1 + Math.sin(t * 1.6) * 0.04;
 
     if (meshRef.current) {
-      meshRef.current.scale.setScalar(intensity * pulse);
-      meshRef.current.rotation.y = t * 0.15;
+      meshRef.current.scale.setScalar(Math.max(0.001, intensity * 0.55 * pulse));
+      meshRef.current.rotation.y = t * 0.12;
     }
     if (glowRef.current) {
-      glowRef.current.scale.setScalar(intensity * 1.8 * pulse);
+      glowRef.current.scale.setScalar(Math.max(0.001, intensity * 0.9 * pulse));
     }
   });
 
   return (
-    <group position={[0, 0, -6]}>
+    <group position={[0, 2.5, -14]}>
       <mesh ref={glowRef}>
         <sphereGeometry args={[1, 32, 32]} />
-        <meshBasicMaterial color="#ffd23f" transparent opacity={0.14} depthWrite={false} />
+        <meshBasicMaterial color="#ffd23f" transparent opacity={0.12} depthWrite={false} />
       </mesh>
       <mesh ref={meshRef}>
         <sphereGeometry args={[1, 64, 64]} />
         <meshStandardMaterial
           color="#ffe066"
           emissive="#ffb703"
-          emissiveIntensity={1.5}
-          roughness={0.25}
-          metalness={0.3}
+          emissiveIntensity={1.1}
+          roughness={0.3}
+          metalness={0.2}
         />
       </mesh>
-      <pointLight color="#ffd23f" intensity={4} distance={12} />
+      <pointLight color="#ffd23f" intensity={2.5} distance={18} />
     </group>
   );
 }

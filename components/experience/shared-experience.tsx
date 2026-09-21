@@ -38,8 +38,8 @@ export function SharedExperience({
           document.documentElement.scrollHeight - window.innerHeight;
         const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
 
-        speedRef.current = 0.4 + progress * 3.0;
-        coreIntensityRef.current = Math.max(0.001, (progress - 0.5) * 3.0);
+        speedRef.current = 0.4 + progress * 2.5;
+        coreIntensityRef.current = Math.max(0.001, (progress - 0.65) * 2.2);
       });
     }
 
@@ -93,24 +93,26 @@ export function SharedExperience({
           {content.phrases.map((phrase, idx) => (
             <RevealSection key={idx} className="min-h-[80vh]">
               <div className="max-w-md sm:max-w-xl px-2 text-center">
-                <p className="text-xl sm:text-3xl font-light leading-relaxed text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+                <p className="text-xl sm:text-3xl font-light leading-relaxed text-white drop-shadow-[0_3px_16px_rgba(0,0,0,0.95)]">
                   “{phrase}”
                 </p>
               </div>
             </RevealSection>
           ))}
 
-          <RevealSection className="min-h-[90vh]">
-            <div className="flex w-full max-w-md flex-col items-center gap-5 text-center pb-12">
+          <RevealSection className="min-h-[95vh]">
+            <div className="flex w-full max-w-md flex-col items-center gap-6 text-center pb-16">
               <AnimatedFlower size={56} />
 
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-amber-200 drop-shadow">
-                {content.finalTitle}
-              </h2>
+              <div className="space-y-3 px-2">
+                <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-amber-100 drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
+                  {content.finalTitle}
+                </h2>
 
-              <p className="text-sm sm:text-base leading-relaxed text-zinc-200 drop-shadow">
-                {content.finalMessage}
-              </p>
+                <p className="text-sm sm:text-base leading-relaxed text-zinc-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)]">
+                  {content.finalMessage}
+                </p>
+              </div>
 
               <div className="w-full pt-2">
                 <LeaveMessageForm prompt={content.formPrompt} />

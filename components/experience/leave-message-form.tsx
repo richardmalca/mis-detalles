@@ -32,7 +32,7 @@ export function LeaveMessageForm({ prompt }: { prompt: string }) {
 
   if (status === "sent") {
     return (
-      <div className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-950/60 p-4 text-emerald-200 backdrop-blur-md">
+      <div className="flex items-center justify-center gap-2 rounded-2xl border border-emerald-500/30 bg-emerald-950/80 p-4 text-emerald-200 backdrop-blur-md">
         <CheckCircle2 className="h-5 w-5 text-emerald-400 shrink-0" />
         <p className="text-sm font-medium">Enviado con cariño ✨</p>
       </div>
@@ -42,9 +42,9 @@ export function LeaveMessageForm({ prompt }: { prompt: string }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full flex-col gap-3 rounded-2xl border border-white/15 bg-zinc-950/70 p-4 sm:p-5 backdrop-blur-lg shadow-2xl text-left"
+      className="flex w-full flex-col gap-3 rounded-2xl border border-white/15 bg-zinc-950/85 p-5 backdrop-blur-xl shadow-[0_10px_40px_rgba(0,0,0,0.8)] text-left"
     >
-      <p className="text-xs font-semibold uppercase tracking-wider text-amber-300">
+      <p className="text-xs font-semibold uppercase tracking-wider text-amber-300/90">
         {prompt}
       </p>
 
@@ -53,7 +53,7 @@ export function LeaveMessageForm({ prompt }: { prompt: string }) {
         value={senderName}
         onChange={(e) => setSenderName(e.target.value)}
         placeholder="Tu nombre (opcional)"
-        className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-400 outline-none focus:border-amber-400/70 focus:bg-white/[0.08]"
+        className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-amber-400/70 focus:bg-white/[0.07]"
       />
 
       <textarea
@@ -61,7 +61,7 @@ export function LeaveMessageForm({ prompt }: { prompt: string }) {
         onChange={(e) => setMessage(e.target.value)}
         placeholder="Escribe tu mensaje..."
         rows={3}
-        className="w-full rounded-xl border border-white/10 bg-white/[0.05] px-3.5 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-400 outline-none focus:border-amber-400/70 focus:bg-white/[0.08] resize-none"
+        className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-amber-400/70 focus:bg-white/[0.07] resize-none"
       />
 
       <button
