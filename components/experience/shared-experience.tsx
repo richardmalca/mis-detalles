@@ -8,7 +8,7 @@ import { LeaveMessageForm } from "./leave-message-form";
 import { AnimatedFlower } from "./animated-flower";
 import { UniverseCanvas } from "./universe-canvas";
 import Link from "next/link";
-import { ArrowLeft, Sparkles } from "lucide-react";
+import { ArrowLeft, Sparkles, ChevronDown } from "lucide-react";
 
 export function SharedExperience({
   recipientName,
@@ -39,8 +39,8 @@ export function SharedExperience({
           document.documentElement.scrollHeight - window.innerHeight;
         const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
 
-        speedRef.current = 0.4 + progress * 3.2;
-        coreIntensityRef.current = Math.max(0.001, (progress - 0.55) * 3.5);
+        speedRef.current = 0.4 + progress * 3.0;
+        coreIntensityRef.current = Math.max(0.001, (progress - 0.5) * 3.0);
       });
     }
 
@@ -56,13 +56,13 @@ export function SharedExperience({
     <div className="relative min-h-screen w-full text-white selection:bg-amber-500/30">
       <UniverseCanvas speedRef={speedRef} coreIntensityRef={coreIntensityRef} />
 
-      <header className="fixed top-4 left-4 z-40 flex items-center gap-2">
+      <header className="fixed top-3 left-3 sm:top-4 sm:left-4 z-40 flex items-center gap-2">
         <Link
           href="/"
           className="flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-950/80 px-3 py-1.5 text-xs text-zinc-300 backdrop-blur-md transition-colors hover:bg-white/10 hover:text-white"
         >
           <ArrowLeft className="h-3.5 w-3.5" />
-          <span>Volver al cosmos</span>
+          <span className="hidden xs:inline">Volver al cosmos</span>
         </Link>
       </header>
 
@@ -74,45 +74,56 @@ export function SharedExperience({
       )}
 
       {opened && (
-        <div className="relative z-10 flex flex-col items-center">
-          <RevealSection className="min-h-[85vh]">
-            <div className="flex max-w-xl flex-col items-center gap-5">
-              <span className="inline-flex items-center gap-1 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-300">
-                <Sparkles className="h-3.5 w-3.5" />
+        <div className="relative z-10 flex flex-col items-center px-4 sm:px-6">
+          <RevealSection className="min-h-[92vh]">
+            <div className="flex max-w-lg flex-col items-center gap-4 sm:gap-6 text-center">
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-400/30 bg-amber-400/10 px-3 py-1 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-amber-300">
+                <Sparkles className="h-3 w-3" />
                 {content.badge}
               </span>
-              <h2 className="text-3xl font-bold tracking-tight text-white sm:text-5xl drop-shadow-md">
+
+              <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-5xl drop-shadow-lg">
                 {recipientName}
-              </h2>
-              <p className="text-lg leading-relaxed text-zinc-200 sm:text-xl font-light">
+              </h1>
+
+              <p className="text-base sm:text-xl font-light leading-relaxed text-zinc-200 drop-shadow">
                 {content.intro}
               </p>
+
               <div className="pt-2">
-                <AnimatedFlower size={48} />
+                <AnimatedFlower size={46} />
+              </div>
+
+              <div className="mt-6 flex flex-col items-center gap-1 text-xs text-zinc-400 animate-bounce">
+                <span>Desliza para continuar</span>
+                <ChevronDown className="h-4 w-4 text-amber-300" />
               </div>
             </div>
           </RevealSection>
 
           {content.phrases.map((phrase, idx) => (
-            <RevealSection key={idx}>
-              <div className="max-w-lg rounded-2xl border border-white/10 bg-zinc-950/70 p-6 sm:p-8 backdrop-blur-lg shadow-2xl">
-                <p className="text-lg sm:text-2xl font-light leading-relaxed text-zinc-100">
+            <RevealSection key={idx} className="min-h-[80vh]">
+              <div className="max-w-md sm:max-w-xl px-2 text-center">
+                <p className="text-xl sm:text-3xl font-light leading-relaxed text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)]">
                   “{phrase}”
                 </p>
               </div>
             </RevealSection>
           ))}
 
-          <RevealSection>
-            <div className="flex max-w-xl flex-col items-center gap-6 rounded-3xl border border-amber-400/20 bg-zinc-950/80 p-8 sm:p-12 backdrop-blur-xl shadow-2xl">
-              <AnimatedFlower size={64} />
-              <h3 className="text-2xl font-bold text-amber-200 sm:text-3xl">
+          <RevealSection className="min-h-[90vh]">
+            <div className="flex w-full max-w-md flex-col items-center gap-5 text-center pb-12">
+              <AnimatedFlower size={56} />
+
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-amber-200 drop-shadow">
                 {content.finalTitle}
-              </h3>
-              <p className="text-base leading-relaxed text-zinc-300">
+              </h2>
+
+              <p className="text-sm sm:text-base leading-relaxed text-zinc-200 drop-shadow">
                 {content.finalMessage}
               </p>
-              <div className="w-full pt-4">
+
+              <div className="w-full pt-2">
                 <LeaveMessageForm prompt={content.formPrompt} />
               </div>
             </div>
