@@ -26,27 +26,27 @@ export function StarDetailModal({ star, onClose }: StarDetailModalProps) {
   return (
     <AnimatePresence>
       {star && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-6 select-none pointer-events-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 select-none pointer-events-auto overflow-hidden">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/75 backdrop-blur-md"
+            className="absolute inset-0 bg-black/80 backdrop-blur-md"
           />
 
           <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 50 }}
-            transition={{ type: "spring", damping: 28, stiffness: 320 }}
-            className="relative w-full max-w-lg max-h-[85vh] overflow-y-auto rounded-t-3xl sm:rounded-2xl border border-white/15 bg-zinc-950/95 p-5 sm:p-7 shadow-2xl backdrop-blur-xl"
+            initial={{ opacity: 0, scale: 0.95, y: 15 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 15 }}
+            transition={{ type: "spring", damping: 26, stiffness: 300 }}
+            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto no-scrollbar rounded-2xl border border-white/15 bg-zinc-950/95 p-5 sm:p-7 shadow-2xl backdrop-blur-2xl"
             style={{
-              boxShadow: `0 0 50px -10px ${star.glowColor}`,
+              boxShadow: `0 0 60px -15px ${star.glowColor}`,
             }}
           >
             <div
-              className="absolute -right-16 -top-16 h-36 w-36 rounded-full blur-3xl pointer-events-none"
+              className="absolute -right-16 -top-16 h-40 w-40 rounded-full blur-3xl pointer-events-none opacity-80"
               style={{ background: star.glowColor }}
             />
 
@@ -74,7 +74,7 @@ export function StarDetailModal({ star, onClose }: StarDetailModalProps) {
 
                 <button
                   onClick={onClose}
-                  className="rounded-full p-2 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
+                  className="rounded-full p-1.5 text-zinc-400 transition-colors hover:bg-white/10 hover:text-white"
                   aria-label="Cerrar modal"
                 >
                   <X className="h-5 w-5" />
@@ -90,14 +90,14 @@ export function StarDetailModal({ star, onClose }: StarDetailModalProps) {
                 </p>
               </div>
 
-              <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-3.5 sm:p-4 text-sm sm:text-base leading-relaxed text-zinc-200">
+              <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm sm:text-base leading-relaxed text-zinc-200">
                 <p className="font-light">{star.content}</p>
               </div>
 
               <div className="mt-5 flex items-center justify-between pt-1 gap-2">
                 <div className="flex items-center gap-1.5 text-[11px] text-zinc-400">
                   <BookmarkCheck className="h-3.5 w-3.5 text-emerald-400 shrink-0" />
-                  <span className="hidden xs:inline">Guardado en el cosmos</span>
+                  <span>Guardado en el cosmos</span>
                 </div>
 
                 <button
