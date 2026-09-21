@@ -107,10 +107,10 @@ export function GalaxyExperience() {
   };
 
   return (
-    <div className="relative h-screen w-screen overflow-hidden bg-black font-sans select-none">
+    <div className="fixed inset-0 h-[100dvh] w-full overflow-hidden bg-black font-sans select-none">
       <canvas
         ref={canvasRef}
-        className={`absolute inset-0 block h-full w-full ${
+        className={`absolute inset-0 block h-full w-full touch-none ${
           isDragging ? "cursor-grabbing" : "cursor-grab"
         }`}
         onPointerDown={handlePointerDown}
@@ -119,7 +119,7 @@ export function GalaxyExperience() {
         onWheel={handleWheel}
       />
 
-      <header className="absolute left-4 top-4 sm:left-6 sm:top-6 z-20 pointer-events-auto flex items-center gap-2.5">
+      <header className="absolute left-4 top-4 sm:left-6 sm:top-6 z-20 pointer-events-auto flex items-center gap-2.5 pt-[env(safe-area-inset-top)]">
         <div className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-2xl border border-white/15 bg-zinc-950/80 shadow-2xl backdrop-blur-xl">
           <Heart className="h-4 w-4 sm:h-5 sm:w-5 text-pink-400 fill-pink-500/20" />
         </div>

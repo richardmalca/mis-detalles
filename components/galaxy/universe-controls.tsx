@@ -22,7 +22,7 @@ export function UniverseControls({
   totalCount,
 }: UniverseControlsProps) {
   return (
-    <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-20 flex flex-col items-end gap-2 pointer-events-auto">
+    <div className="absolute bottom-6 right-4 sm:bottom-8 sm:right-6 z-20 flex flex-col items-end gap-2 pointer-events-auto pb-[env(safe-area-inset-bottom)]">
       <div className="flex items-center gap-1.5 rounded-full border border-white/10 bg-zinc-950/80 px-3 py-1.5 text-[11px] sm:text-xs font-medium text-zinc-300 backdrop-blur-xl shadow-xl">
         <Sparkles className="h-3 w-3 text-amber-400" />
         <span>
