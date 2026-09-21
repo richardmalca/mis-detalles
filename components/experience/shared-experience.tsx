@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getExperienceContent, ExperienceKind } from "@/lib/content";
 import { OpeningCard } from "./opening-card";
 import { RevealSection } from "./reveal-section";
 import { LeaveMessageForm } from "./leave-message-form";
 import { AnimatedFlower } from "./animated-flower";
+import { UniverseCanvas } from "./universe-canvas";
 import Link from "next/link";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
@@ -18,10 +19,42 @@ export function SharedExperience({
 }) {
   const [opened, setOpened] = useState(false);
   const content = getExperienceContent(kind, recipientName);
+  const speedRef = useRef(0.4);
+  const coreIntensityRef = useRef(0.001);
+
+  useEffect(() => {
+    document.body.style.overflow = opened ? "" : "hidden";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [opened]);
+
+  useEffect(() => {
+    let raf = 0;
+
+    function onScroll() {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const scrollable =
+          document.documentElement.scrollHeight - window.innerHeight;
+        const progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+
+        speedRef.current = 0.4 + progress * 3.2;
+        coreIntensityRef.current = Math.max(0.001, (progress - 0.55) * 3.5);
+      });
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
 
   return (
-    <div className="relative min-h-screen w-full bg-zinc-950 text-white selection:bg-amber-500/30">
-      <div className="fixed inset-0 pointer-events-none -z-10 bg-[radial-gradient(ellipse_at_top,rgba(251,191,36,0.12),transparent_60%)]" />
+    <div className="relative min-h-screen w-full text-white selection:bg-amber-500/30">
+      <UniverseCanvas speedRef={speedRef} coreIntensityRef={coreIntensityRef} />
 
       <header className="fixed top-4 left-4 z-40 flex items-center gap-2">
         <Link
