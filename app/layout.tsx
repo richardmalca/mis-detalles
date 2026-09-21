@@ -12,9 +12,31 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://mis-detalles-three.vercel.app";
+
 export const metadata: Metadata = {
-  title: "Mis Detalles | Un Universo Para Ti",
-  description: "Nuestro cosmos de recuerdos y detalles compartidos.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Tengo un detalle para ti... ✨ Abre tu universo",
+    template: "%s | Mis Detalles",
+  },
+  description:
+    "Abre este enlace para descubrir el universo de recuerdos, flores amarillas y palabras que preparé para ti.",
+  openGraph: {
+    title: "Tengo un detalle especial para ti... ✨🌻",
+    description:
+      "Abre este enlace para descubrir el universo cósmico, flores amarillas y recuerdos que preparé para ti.",
+    url: siteUrl,
+    siteName: "Mis Detalles",
+    locale: "es_ES",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Tengo un detalle especial para ti... ✨🌻",
+    description:
+      "Abre este enlace para descubrir el universo cósmico, flores amarillas y recuerdos que preparé para ti.",
+  },
 };
 
 export const viewport: Viewport = {

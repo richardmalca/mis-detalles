@@ -4,11 +4,6 @@ import { NotFoundCard } from "@/components/experience/not-found-card";
 import { supabase } from "@/lib/supabase";
 import type { ExperienceKind } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Universo Personalizado | Mis Detalles 🌼",
-  description: "Una experiencia cósmica de amor y amistad.",
-};
-
 interface ExperienciaPageProps {
   params: Promise<{ code: string }>;
 }
@@ -16,6 +11,42 @@ interface ExperienciaPageProps {
 interface LoveLinkData {
   kind?: string;
   recipient_name?: string;
+}
+
+export async function generateMetadata({
+  params,
+}: ExperienciaPageProps): Promise<Metadata> {
+  const { code } = await params;
+
+  try {
+    const { data } = await supabase
+      .rpc("get_love_link", { p_code: code })
+      .maybeSingle();
+
+    const linkData = data as LoveLinkData;
+    const name = linkData?.recipient_name?.trim() || "ti";
+    const icon = linkData?.kind === "amistad" ? "🌻" : "🌼";
+
+    return {
+      title: `${name}, tengo un detalle para ti ${icon} Abre tu universo`,
+      description: `Un universo de flores amarillas, constelaciones y palabras dedicado especialmente para ti, ${name}. Toca para entrar.`,
+      openGraph: {
+        title: `${name}, preparé un universo para ti ${icon}`,
+        description: `Entra para descubrir las flores amarillas, recuerdos y palabras que te dedico bajo el cosmos.`,
+        type: "website",
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: `${name}, preparé un universo para ti ${icon}`,
+        description: `Entra para descubrir las flores amarillas, recuerdos y palabras que te dedico bajo el cosmos.`,
+      },
+    };
+  } catch {
+    return {
+      title: "Tengo un detalle especial para ti ✨ Abre tu universo",
+      description: "Entra para descubrir el universo de flores amarillas y palabras dedicadas.",
+    };
+  }
 }
 
 export default async function ExperienciaPage({ params }: ExperienciaPageProps) {
