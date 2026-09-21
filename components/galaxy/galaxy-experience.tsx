@@ -10,8 +10,8 @@ import { Heart, MousePointerClick, Move3d } from "lucide-react";
 
 export function GalaxyExperience() {
   const audioContextRef = useRef<AudioContext | null>(null);
-  const oscillatorRef = useRef<OscillatorNode | null>(null);
-  const gainNodeRef = useRef<GainNode | null>(null);
+  const chimeIntervalRef = useRef<number | null>(null);
+  const masterGainRef = useRef<GainNode | null>(null);
 
   const {
     canvasRef,
@@ -33,45 +33,75 @@ export function GalaxyExperience() {
     handleWheel,
   } = useGalaxyCanvas();
 
+  const playHarmonicChime = (ctx: AudioContext, gainNode: GainNode) => {
+    const scale = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25];
+    const freq = scale[Math.floor(Math.random() * scale.length)];
+
+    const osc = ctx.createOscillator();
+    const noteGain = ctx.createGain();
+
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+    noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
+    noteGain.gain.exponentialRampToValueAtTime(0.035, ctx.currentTime + 0.08);
+    noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.8);
+
+    osc.connect(noteGain);
+    noteGain.connect(gainNode);
+
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 3.0);
+  };
+
   const toggleCosmicAudio = () => {
     if (isAudioPlaying) {
-      if (gainNodeRef.current && audioContextRef.current) {
-        gainNodeRef.current.gain.setTargetAtTime(0, audioContextRef.current.currentTime, 0.5);
+      if (chimeIntervalRef.current) {
+        clearInterval(chimeIntervalRef.current);
+        chimeIntervalRef.current = null;
+      }
+      if (masterGainRef.current && audioContextRef.current) {
+        masterGainRef.current.gain.setTargetAtTime(0, audioContextRef.current.currentTime, 0.4);
         setTimeout(() => {
-          oscillatorRef.current?.stop();
-          oscillatorRef.current?.disconnect();
           audioContextRef.current?.close();
           audioContextRef.current = null;
-        }, 500);
+          masterGainRef.current = null;
+        }, 450);
       }
       setIsAudioPlaying(false);
     } else {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       const ctx = new AudioCtx();
       audioContextRef.current = ctx;
 
-      const osc = ctx.createOscillator();
-      const osc2 = ctx.createOscillator();
-      const gain = ctx.createGain();
+      const masterGain = ctx.createGain();
+      masterGain.gain.setValueAtTime(0.01, ctx.currentTime);
+      masterGain.gain.exponentialRampToValueAtTime(0.9, ctx.currentTime + 1.2);
+      masterGain.connect(ctx.destination);
+      masterGainRef.current = masterGain;
 
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(108, ctx.currentTime);
+      const warmPad = ctx.createOscillator();
+      const padGain = ctx.createGain();
+      warmPad.type = "triangle";
+      warmPad.frequency.setValueAtTime(220, ctx.currentTime);
+      padGain.gain.setValueAtTime(0.012, ctx.currentTime);
+      warmPad.connect(padGain);
+      padGain.connect(masterGain);
+      warmPad.start();
 
-      osc2.type = "sine";
-      osc2.frequency.setValueAtTime(216, ctx.currentTime);
+      playHarmonicChime(ctx, masterGain);
+      setTimeout(() => {
+        if (audioContextRef.current) playHarmonicChime(ctx, masterGain);
+      }, 700);
 
-      gain.gain.setValueAtTime(0.01, ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.04, ctx.currentTime + 3);
+      chimeIntervalRef.current = window.setInterval(() => {
+        if (audioContextRef.current) {
+          playHarmonicChime(ctx, masterGain);
+        }
+      }, 2200);
 
-      osc.connect(gain);
-      osc2.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start();
-      osc2.start();
-
-      oscillatorRef.current = osc;
-      gainNodeRef.current = gain;
       setIsAudioPlaying(true);
     }
   };
