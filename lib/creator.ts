@@ -31,3 +31,33 @@ export async function ensureCreator(): Promise<{ id: string; pin: string } | nul
   saveStoredCreator(creator.id, creator.pin);
   return creator;
 }
+
+const CREATOR_CREATED_LINKS = "mdt_my_created_codes";
+
+export function markCodeAsCreatedByMe(code: string): void {
+  if (typeof window === "undefined") return;
+  try {
+    const existing = JSON.parse(window.localStorage.getItem(CREATOR_CREATED_LINKS) || "[]");
+    if (!existing.includes(code)) {
+      existing.push(code);
+      window.localStorage.setItem(CREATOR_CREATED_LINKS, JSON.stringify(existing));
+    }
+  } catch {}
+}
+
+export function isCodeCreatedByMe(code: string): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const existing = JSON.parse(window.localStorage.getItem(CREATOR_CREATED_LINKS) || "[]");
+    if (Array.isArray(existing) && existing.includes(code)) {
+      return true;
+    }
+    const creator = getStoredCreator();
+    if (creator?.id) {
+      return true;
+    }
+    return false;
+  } catch {
+    return false;
+  }
+}

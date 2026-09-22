@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 import { OpeningCard } from "./opening-card";
 import { AnimatedFlower } from "./animated-flower";
 import { LeaveMessageForm } from "./leave-message-form";
+import { isCodeCreatedByMe } from "@/lib/creator";
 import { useCosmicAudio } from "@/hooks/use-cosmic-audio";
 import { useGalaxyCanvas } from "@/hooks/use-galaxy-canvas";
 import confetti from "canvas-confetti";
@@ -56,7 +57,9 @@ export function SharedExperience({
     startAudio();
     setOpened(true);
     setIsAutoPlaying(true);
-    supabase.rpc("mark_link_opened", { p_code: code }).then(() => {});
+    if (!isCodeCreatedByMe(code)) {
+      supabase.rpc("mark_link_opened", { p_code: code }).then(() => {});
+    }
     confetti({
       particleCount: 40,
       spread: 70,
@@ -70,7 +73,9 @@ export function SharedExperience({
       const next = Math.min(prev + 1, totalSteps - 1);
       if (next === totalSteps - 1 && !hasMarkedComplete.current) {
         hasMarkedComplete.current = true;
-        supabase.rpc("mark_link_completed", { p_code: code }).then(() => {});
+        if (!isCodeCreatedByMe(code)) {
+          supabase.rpc("mark_link_completed", { p_code: code }).then(() => {});
+        }
       }
       return next;
     });

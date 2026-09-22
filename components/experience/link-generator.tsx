@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { AnimatedFlower } from "./animated-flower";
 import { supabase } from "@/lib/supabase";
-import { ensureCreator, getStoredCreator } from "@/lib/creator";
+import { ensureCreator, getStoredCreator, markCodeAsCreatedByMe } from "@/lib/creator";
 import { ExperienceKind } from "@/lib/content";
 import {
   Sparkles,
@@ -57,6 +57,8 @@ export function LinkGenerator() {
         setStatus("error");
         return;
       }
+
+      markCodeAsCreatedByMe(data as string);
 
       const origin = typeof window !== "undefined" ? window.location.origin : "";
       setLink(`${origin}/experiencia/${data}`);
