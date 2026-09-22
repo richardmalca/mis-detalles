@@ -11,7 +11,7 @@ export type ExperienceContent = {
 };
 
 const BASE = {
-  occasionLabel: "Día de las Flores Amarillas · 21 de marzo",
+  occasionLabel: "Día de las Flores Amarillas",
   formPrompt: "Déjame unas palabras con cariño:",
 };
 
@@ -30,7 +30,7 @@ function amor(name: string): Omit<ExperienceContent, "occasionLabel"> {
     ],
     finalTitle: `${name}, gracias por ser mi hogar y mi lugar favorito.`,
     finalMessage:
-      "Feliz 21 de marzo. Que estas flores amarillas te recuerden lo inmensamente especial que eres en mi vida.",
+      "Que estas flores amarillas te recuerden siempre lo inmensamente especial que eres en mi vida.",
     formPrompt: BASE.formPrompt,
   };
 }
@@ -50,7 +50,7 @@ function amistad(name: string): Omit<ExperienceContent, "occasionLabel"> {
     ],
     finalTitle: `${name}, personas como tú hacen que este viaje valga la pena.`,
     finalMessage:
-      "Feliz 21 de marzo. Que la vida te devuelva toda la luz y alegría que siempre entregas.",
+      "Que la vida te devuelva siempre toda la luz, alegría y bondad que entregas a los demás.",
     formPrompt: BASE.formPrompt,
   };
 }
