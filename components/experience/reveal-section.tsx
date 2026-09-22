@@ -20,15 +20,16 @@ export function RevealSection({
     if (!el) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
-        setVisible(entry.isIntersecting);
-        if (entry.isIntersecting) onVisible?.();
+        if (entry.isIntersecting) {
+          setVisible(true);
+          onVisible?.();
+        }
       },
-      { threshold: 0.4 }
+      { threshold: 0.15, rootMargin: "0px 0px -50px 0px" }
     );
     observer.observe(el);
     return () => observer.disconnect();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [onVisible]);
 
   return (
     <div

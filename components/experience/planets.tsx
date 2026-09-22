@@ -128,17 +128,20 @@ function SolarPlanet({
   const baseZ = initialPos[2];
   const orbitOffset = useRef(Math.random() * Math.PI * 2);
 
-  useFrame(({ camera, clock }, delta) => {
+  useFrame(({ camera, size, clock }, delta) => {
     if (meshRef.current) {
       meshRef.current.rotation.y += delta * spinSpeed;
     }
 
     if (groupRef.current) {
+      const aspect = size.width / Math.max(size.height, 1);
+      const isNarrow = aspect < 0.8;
+      const xCompression = isNarrow ? 0.45 : aspect < 1.2 ? 0.75 : 1.0;
       const t = clock.getElapsedTime() + orbitOffset.current;
       const distanceFactor = Math.abs(baseZ);
       const parallax = (camera.position.z - 5) * (18 / distanceFactor);
 
-      groupRef.current.position.x = baseX + Math.cos(t * orbitSpeed) * orbitRadius;
+      groupRef.current.position.x = baseX * xCompression + Math.cos(t * orbitSpeed) * orbitRadius;
       groupRef.current.position.y =
         baseY + Math.sin(t * bobSpeed) * bobAmount + Math.sin(t * orbitSpeed) * orbitRadius * 0.4;
       groupRef.current.position.z = baseZ + parallax * 0.2 + Math.cos(t * bobSpeed * 0.7) * 0.8;
