@@ -10,24 +10,42 @@ export function useCosmicAudio() {
 
   const playHarmonicChime = useCallback((ctx: AudioContext, gainNode: GainNode) => {
     try {
-      const scale = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25];
-      const freq = scale[Math.floor(Math.random() * scale.length)];
+      const melody = [
+        261.63,
+        293.66,
+        329.63,
+        349.23,
+        392.0,
+        440.0,
+        493.88,
+        523.25,
+        587.33,
+        659.25,
+      ];
+      const freq = melody[Math.floor(Math.random() * melody.length)];
 
       const osc = ctx.createOscillator();
+      const oscHarmonic = ctx.createOscillator();
       const noteGain = ctx.createGain();
 
       osc.type = "sine";
       osc.frequency.setValueAtTime(freq, ctx.currentTime);
 
+      oscHarmonic.type = "sine";
+      oscHarmonic.frequency.setValueAtTime(freq * 2, ctx.currentTime);
+
       noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
-      noteGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.08);
-      noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.5);
+      noteGain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.03);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.2);
 
       osc.connect(noteGain);
+      oscHarmonic.connect(noteGain);
       noteGain.connect(gainNode);
 
       osc.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 2.6);
+      oscHarmonic.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 2.3);
+      oscHarmonic.stop(ctx.currentTime + 2.3);
     } catch {}
   }, []);
 
@@ -59,22 +77,19 @@ export function useCosmicAudio() {
         masterGain.connect(ctx.destination);
         masterGainRef.current = masterGain;
 
-        const warmPad = ctx.createOscillator();
-        const padGain = ctx.createGain();
-        warmPad.type = "sine";
-        warmPad.frequency.setValueAtTime(220, ctx.currentTime);
-        padGain.gain.setValueAtTime(0.05, ctx.currentTime);
-        warmPad.connect(padGain);
-        padGain.connect(masterGain);
-        warmPad.start();
-
         playHarmonicChime(ctx, masterGain);
 
         setTimeout(() => {
           if (audioCtxRef.current && masterGainRef.current) {
             playHarmonicChime(audioCtxRef.current, masterGainRef.current);
           }
-        }, 600);
+        }, 500);
+
+        setTimeout(() => {
+          if (audioCtxRef.current && masterGainRef.current) {
+            playHarmonicChime(audioCtxRef.current, masterGainRef.current);
+          }
+        }, 1100);
 
         chimeIntervalRef.current = window.setInterval(() => {
           if (audioCtxRef.current && masterGainRef.current) {
@@ -83,7 +98,7 @@ export function useCosmicAudio() {
             }
             playHarmonicChime(audioCtxRef.current, masterGainRef.current);
           }
-        }, 2200);
+        }, 1800);
       }
 
       setIsPlaying(true);
