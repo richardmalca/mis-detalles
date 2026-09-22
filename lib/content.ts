@@ -1,3 +1,6 @@
+import type { Occasion } from "./occasions";
+import { getOccasionById } from "./occasions";
+
 export type ExperienceKind = "amor" | "amistad";
 
 export type ExperienceContent = {
@@ -10,10 +13,7 @@ export type ExperienceContent = {
   occasionLabel: string;
 };
 
-const BASE = {
-  occasionLabel: "Día de las Flores Amarillas",
-  formPrompt: "Déjame unas palabras con cariño:",
-};
+const FORM_PROMPT = "Déjame unas palabras con cariño:";
 
 const STORY_COUNT = 60;
 
@@ -30,18 +30,23 @@ type StorySlots = {
   openers: string[];
   developments: string[];
   realizations: string[];
-  flowerLines: string[];
+  flowerLines: ((item: string) => string)[];
   promiseLines: ((name: string) => string)[];
   closingLines: string[];
 };
 
-function buildStory(slots: StorySlots, index: number, name: string): string[] {
+function buildStory(
+  slots: StorySlots,
+  index: number,
+  name: string,
+  item: string
+): string[] {
   const i = index % STORY_COUNT;
   return [
     slots.openers[i % slots.openers.length],
     slots.developments[(i * 7 + 3) % slots.developments.length],
     slots.realizations[(i * 13 + 5) % slots.realizations.length],
-    slots.flowerLines[(i * 11 + 2) % slots.flowerLines.length],
+    slots.flowerLines[(i * 11 + 2) % slots.flowerLines.length](item),
     slots.promiseLines[(i * 17 + 1) % slots.promiseLines.length](name),
     slots.closingLines[(i * 19 + 4) % slots.closingLines.length],
   ];
@@ -100,21 +105,21 @@ const AMOR_SLOTS: StorySlots = {
     "Comprendí, sin mucho drama, que esto era simplemente lo que se siente cuando algo está bien.",
   ],
   flowerLines: [
-    "Las flores amarillas de hoy representan justamente eso: una promesa de quedarse, de iluminar y de acompañar.",
-    "Hoy, en el día de las flores amarillas, quiero que sepas que cada pétalo representa un motivo distinto para agradecerte.",
-    "Dicen que estas flores simbolizan lealtad y calidez, y no se me ocurre mejor forma de describir lo que siento.",
-    "Las flores amarillas de este día son solo un símbolo pequeño de algo que siento todos los días, no solo hoy.",
-    "Hoy el amarillo de estas flores me recordó exactamente a la calidez que trajiste a mi vida.",
-    "Elegí estas flores amarillas porque representan justo lo que quiero decirte sin necesitar muchas palabras.",
-    "En el día de las flores amarillas, quise encontrar una forma de decir gracias que se sintiera tan sincera como se siente esto.",
-    "Estas flores amarillas no alcanzan para explicar todo lo que significas, pero son un buen punto de partida.",
-    "Hoy quise regalarte algo simple: unas flores amarillas y una historia real detrás de ellas.",
-    "El amarillo de estas flores me pareció el color correcto para representar lo que siento cuando pienso en ti.",
-    "Estas flores representan una promesa silenciosa: la de seguir eligiéndote, día tras día.",
-    "En este día de las flores amarillas, quise que supieras que sigues siendo mi motivo favorito para celebrar algo.",
-    "Cada pétalo amarillo de hoy representa una razón distinta por la que esto sigue valiendo la pena.",
-    "Hoy elegí estas flores porque su color me recuerda a la calidez que solo tú sabes dar.",
-    "Las flores amarillas de este día llevan un mensaje simple: gracias por seguir aquí.",
+    (item) => `Los ${item} de hoy representan justamente eso: una promesa de quedarse, de iluminar y de acompañar.`,
+    (item) => `Hoy, en este día, quiero que sepas que cada detalle de estos ${item} representa un motivo distinto para agradecerte.`,
+    (item) => `Dicen que ${item} como estos simbolizan lealtad y calidez, y no se me ocurre mejor forma de describir lo que siento.`,
+    (item) => `Estos ${item} de este día son solo un símbolo pequeño de algo que siento todos los días, no solo hoy.`,
+    (item) => `Hoy estos ${item} me recordaron exactamente a la calidez que trajiste a mi vida.`,
+    (item) => `Elegí estos ${item} porque representan justo lo que quiero decirte sin necesitar muchas palabras.`,
+    (item) => `En este día, quise encontrar una forma de decir gracias que se sintiera tan sincera como estos ${item}.`,
+    (item) => `Estos ${item} no alcanzan para explicar todo lo que significas, pero son un buen punto de partida.`,
+    (item) => `Hoy quise regalarte algo simple: unos ${item} y una historia real detrás de ellos.`,
+    (item) => `Estos ${item} me parecieron la forma correcta de representar lo que siento cuando pienso en ti.`,
+    (item) => `Estos ${item} representan una promesa silenciosa: la de seguir eligiéndote, día tras día.`,
+    (item) => `En este día, quise que supieras que sigues siendo mi motivo favorito para celebrar algo, como estos ${item} lo celebran hoy.`,
+    (item) => `Cada detalle de estos ${item} representa una razón distinta por la que esto sigue valiendo la pena.`,
+    (item) => `Hoy elegí estos ${item} porque me recuerdan a la calidez que solo tú sabes dar.`,
+    (item) => `Estos ${item} de este día llevan un mensaje simple: gracias por seguir aquí.`,
   ],
   promiseLines: [
     (n) => `Por eso hoy, ${n}, quiero prometerte que voy a seguir eligiéndote, incluso en los días difíciles.`,
@@ -205,21 +210,21 @@ const AMISTAD_SLOTS: StorySlots = {
     "Comprendí, sin mucho drama, que esto era simplemente lo que se siente cuando una amistad está bien construida.",
   ],
   flowerLines: [
-    "Las flores amarillas de hoy representan justamente eso: lealtad, calidez y una amistad que permanece.",
-    "Hoy, en el día de las flores amarillas, quiero que sepas que cada pétalo representa un motivo distinto para agradecerte.",
-    "Dicen que estas flores simbolizan lealtad incondicional, y no se me ocurre mejor forma de describir esta amistad.",
-    "Las flores amarillas de este día son solo un símbolo pequeño de algo que valoro todos los días, no solo hoy.",
-    "Hoy el amarillo de estas flores me recordó exactamente a la calidez que trajiste a mi vida como amigo.",
-    "Elegí estas flores amarillas porque representan justo lo que quiero decirte sin necesitar muchas palabras.",
-    "En el día de las flores amarillas, quise encontrar una forma de decir gracias que se sintiera tan sincera como esta amistad.",
-    "Estas flores amarillas no alcanzan para explicar todo lo que significa esta amistad, pero son un buen punto de partida.",
-    "Hoy quise regalarte algo simple: unas flores amarillas y una historia real detrás de ellas.",
-    "El amarillo de estas flores me pareció el color correcto para representar el valor de esta amistad.",
-    "Estas flores representan una promesa silenciosa: la de seguir estando presente, pase lo que pase.",
-    "En este día de las flores amarillas, quise que supieras que sigues siendo una de las personas que más aprecio.",
-    "Cada pétalo amarillo de hoy representa una razón distinta por la que esta amistad sigue valiendo la pena.",
-    "Hoy elegí estas flores porque su color me recuerda a la calidez que solo un buen amigo sabe dar.",
-    "Las flores amarillas de este día llevan un mensaje simple: gracias por seguir aquí.",
+    (item) => `Los ${item} de hoy representan justamente eso: lealtad, calidez y una amistad que permanece.`,
+    (item) => `Hoy, en este día, quiero que sepas que estos ${item} representan un motivo distinto para agradecerte.`,
+    (item) => `Dicen que ${item} como estos simbolizan lealtad incondicional, y no se me ocurre mejor forma de describir esta amistad.`,
+    (item) => `Estos ${item} de este día son solo un símbolo pequeño de algo que valoro todos los días, no solo hoy.`,
+    (item) => `Hoy estos ${item} me recordaron exactamente a la calidez que trajiste a mi vida como amigo.`,
+    (item) => `Elegí estos ${item} porque representan justo lo que quiero decirte sin necesitar muchas palabras.`,
+    (item) => `En este día, quise encontrar una forma de decir gracias que se sintiera tan sincera como esta amistad, como estos ${item}.`,
+    (item) => `Estos ${item} no alcanzan para explicar todo lo que significa esta amistad, pero son un buen punto de partida.`,
+    (item) => `Hoy quise regalarte algo simple: unos ${item} y una historia real detrás de ellos.`,
+    (item) => `Estos ${item} me parecieron la forma correcta de representar el valor de esta amistad.`,
+    (item) => `Estos ${item} representan una promesa silenciosa: la de seguir estando presente, pase lo que pase.`,
+    (item) => `En este día, quise que supieras que sigues siendo una de las personas que más aprecio, como celebran estos ${item} hoy.`,
+    (item) => `Cada detalle de estos ${item} representa una razón distinta por la que esta amistad sigue valiendo la pena.`,
+    (item) => `Hoy elegí estos ${item} porque me recuerdan a la calidez que solo un buen amigo sabe dar.`,
+    (item) => `Estos ${item} de este día llevan un mensaje simple: gracias por seguir aquí.`,
   ],
   promiseLines: [
     (n) => `Por eso hoy, ${n}, quiero prometerte que voy a seguir estando presente, incluso en los días difíciles.`,
@@ -257,39 +262,47 @@ const AMISTAD_SLOTS: StorySlots = {
   ],
 };
 
-function amor(name: string): Omit<ExperienceContent, "occasionLabel"> {
+function amor(
+  name: string,
+  occasion: Occasion
+): Omit<ExperienceContent, "occasionLabel"> {
   const index = hashString(name.toLowerCase()) % STORY_COUNT;
   return {
-    badge: "🌼 para ti",
+    badge: `${occasion.emoji} para ti`,
     intro:
       "Si alguna vez te has preguntado cómo comenzó todo, esta es la historia de cómo cambiaste mi cielo.",
-    phrases: buildStory(AMOR_SLOTS, index, name),
+    phrases: buildStory(AMOR_SLOTS, index, name, occasion.itemName),
     finalTitle: `${name}, gracias por ser mi hogar y mi lugar favorito.`,
-    finalMessage:
-      "Que estas flores amarillas te recuerden siempre lo inmensamente especial que eres en mi vida.",
-    formPrompt: BASE.formPrompt,
+    finalMessage: `Que estos ${occasion.itemName} te recuerden siempre lo inmensamente especial que eres en mi vida.`,
+    formPrompt: FORM_PROMPT,
   };
 }
 
-function amistad(name: string): Omit<ExperienceContent, "occasionLabel"> {
+function amistad(
+  name: string,
+  occasion: Occasion
+): Omit<ExperienceContent, "occasionLabel"> {
   const index = hashString(name.toLowerCase()) % STORY_COUNT;
   return {
-    badge: "🌻 para ti",
+    badge: `${occasion.emoji} para ti`,
     intro:
       "Hay personas que no llegan por casualidad a nuestras vidas; llegan para quedarse como un refugio.",
-    phrases: buildStory(AMISTAD_SLOTS, index, name),
+    phrases: buildStory(AMISTAD_SLOTS, index, name, occasion.itemName),
     finalTitle: `${name}, personas como tú hacen que este viaje valga la pena.`,
     finalMessage:
       "Que la vida te devuelva siempre toda la luz, alegría y bondad que entregas a los demás.",
-    formPrompt: BASE.formPrompt,
+    formPrompt: FORM_PROMPT,
   };
 }
 
 export function getExperienceContent(
   kind: ExperienceKind,
-  name: string
+  name: string,
+  occasionId?: string | null
 ): ExperienceContent {
   const safeName = name.trim() || "ti";
-  const content = kind === "amistad" ? amistad(safeName) : amor(safeName);
-  return { ...content, occasionLabel: BASE.occasionLabel };
+  const occasion = getOccasionById(occasionId);
+  const content =
+    kind === "amistad" ? amistad(safeName, occasion) : amor(safeName, occasion);
+  return { ...content, occasionLabel: occasion.label };
 }

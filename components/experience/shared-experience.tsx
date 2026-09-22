@@ -27,15 +27,17 @@ export function SharedExperience({
   recipientName,
   kind,
   code,
+  occasionId,
 }: {
   recipientName: string;
   kind: ExperienceKind;
   code: string;
+  occasionId?: string;
 }) {
   const [opened, setOpened] = useState(false);
   const [step, setStep] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
-  const content = getExperienceContent(kind, recipientName);
+  const content = getExperienceContent(kind, recipientName, occasionId);
   const hasMarkedComplete = useRef(false);
   const autoPlayTimer = useRef<number | null>(null);
 

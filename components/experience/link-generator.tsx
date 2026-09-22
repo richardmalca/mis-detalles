@@ -5,6 +5,7 @@ import { AnimatedFlower } from "./animated-flower";
 import { supabase } from "@/lib/supabase";
 import { ensureCreator, getStoredCreator, markCodeAsCreatedByMe } from "@/lib/creator";
 import { ExperienceKind } from "@/lib/content";
+import { getCurrentOccasion } from "@/lib/occasions";
 import {
   Sparkles,
   Copy,
@@ -47,10 +48,13 @@ export function LinkGenerator() {
       }
       setCreatorPin(creator.pin);
 
+      const occasion = getCurrentOccasion();
+
       const { data, error } = await supabase.rpc("create_love_link", {
         p_name: name.trim(),
         p_kind: kind,
         p_creator_id: creator.id,
+        p_occasion_id: occasion.id,
       });
 
       if (error || !data) {

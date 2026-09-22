@@ -11,6 +11,7 @@ interface ExperienciaPageProps {
 interface LoveLinkData {
   kind?: string;
   recipient_name?: string;
+  occasion_id?: string;
 }
 
 export async function generateMetadata({
@@ -80,9 +81,15 @@ export default async function ExperienciaPage({ params }: ExperienciaPageProps) 
     const linkData = data as LoveLinkData;
     const kind: ExperienceKind = linkData.kind === "amistad" ? "amistad" : "amor";
     const recipientName = linkData.recipient_name || "Ti";
+    const occasionId = linkData.occasion_id || "flores-amarillas";
 
     return (
-      <SharedExperience recipientName={recipientName} kind={kind} code={code} />
+      <SharedExperience
+        recipientName={recipientName}
+        kind={kind}
+        code={code}
+        occasionId={occasionId}
+      />
     );
   } catch {
     return <NotFoundCard />;
