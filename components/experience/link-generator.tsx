@@ -97,7 +97,7 @@ export function LinkGenerator() {
             setName(e.target.value);
             setLink(null);
           }}
-          placeholder="Ej. Elizeth, Sofía, Mi Amor..."
+          placeholder="Escribe un nombre..."
           className="w-full rounded-xl border border-white/10 bg-white/[0.04] px-4 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 outline-none focus:border-amber-400/70 focus:bg-white/[0.08]"
         />
       </div>
