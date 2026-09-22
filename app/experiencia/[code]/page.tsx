@@ -34,11 +34,20 @@ export async function generateMetadata({
         title: `${name}, preparé un universo para ti ${icon}`,
         description: `Entra para descubrir las flores amarillas, recuerdos y palabras que te dedico bajo el cosmos.`,
         type: "website",
+        images: [
+          {
+            url: `/experiencia/${code}/opengraph-image`,
+            width: 1200,
+            height: 630,
+            alt: `Detalle especial para ${name}`,
+          },
+        ],
       },
       twitter: {
         card: "summary_large_image",
         title: `${name}, preparé un universo para ti ${icon}`,
         description: `Entra para descubrir las flores amarillas, recuerdos y palabras que te dedico bajo el cosmos.`,
+        images: [`/experiencia/${code}/opengraph-image`],
       },
     };
   } catch {
