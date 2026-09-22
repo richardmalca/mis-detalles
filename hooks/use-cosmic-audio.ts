@@ -35,8 +35,8 @@ export function useCosmicAudio() {
       oscHarmonic.frequency.setValueAtTime(freq * 2, ctx.currentTime);
 
       noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
-      noteGain.gain.linearRampToValueAtTime(0.18, ctx.currentTime + 0.03);
-      noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.2);
+      noteGain.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 0.05);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.6);
 
       osc.connect(noteGain);
       oscHarmonic.connect(noteGain);
@@ -44,8 +44,8 @@ export function useCosmicAudio() {
 
       osc.start(ctx.currentTime);
       oscHarmonic.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 2.3);
-      oscHarmonic.stop(ctx.currentTime + 2.3);
+      osc.stop(ctx.currentTime + 2.7);
+      oscHarmonic.stop(ctx.currentTime + 2.7);
     } catch {}
   }, []);
 
@@ -73,7 +73,7 @@ export function useCosmicAudio() {
 
       if (!masterGainRef.current) {
         const masterGain = ctx.createGain();
-        masterGain.gain.setValueAtTime(0.85, ctx.currentTime);
+        masterGain.gain.setValueAtTime(0.7, ctx.currentTime);
         masterGain.connect(ctx.destination);
         masterGainRef.current = masterGain;
 
@@ -83,13 +83,7 @@ export function useCosmicAudio() {
           if (audioCtxRef.current && masterGainRef.current) {
             playHarmonicChime(audioCtxRef.current, masterGainRef.current);
           }
-        }, 500);
-
-        setTimeout(() => {
-          if (audioCtxRef.current && masterGainRef.current) {
-            playHarmonicChime(audioCtxRef.current, masterGainRef.current);
-          }
-        }, 1100);
+        }, 700);
 
         chimeIntervalRef.current = window.setInterval(() => {
           if (audioCtxRef.current && masterGainRef.current) {
@@ -98,7 +92,7 @@ export function useCosmicAudio() {
             }
             playHarmonicChime(audioCtxRef.current, masterGainRef.current);
           }
-        }, 1800);
+        }, 2400);
       }
 
       setIsPlaying(true);

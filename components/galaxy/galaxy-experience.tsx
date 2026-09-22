@@ -1,6 +1,5 @@
 "use client";
 
-import { useRef } from "react";
 import { useGalaxyCanvas } from "@/hooks/use-galaxy-canvas";
 import { MEMORY_STARS, CONSTELLATIONS } from "@/data/memories";
 import { StarDetailModal } from "./star-detail-modal";
@@ -8,10 +7,10 @@ import { ConstellationHud } from "./constellation-hud";
 import { UniverseControls } from "./universe-controls";
 import { Heart, MousePointerClick, Move3d } from "lucide-react";
 
+import { useCosmicAudio } from "@/hooks/use-cosmic-audio";
+
 export function GalaxyExperience() {
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const chimeIntervalRef = useRef<number | null>(null);
-  const masterGainRef = useRef<GainNode | null>(null);
+  const { isPlaying: isAudioPlaying, toggle: toggleCosmicAudio } = useCosmicAudio();
 
   const {
     canvasRef,
@@ -20,8 +19,6 @@ export function GalaxyExperience() {
     activeConstellationId,
     setActiveConstellationId,
     isDragging,
-    isAudioPlaying,
-    setIsAudioPlaying,
     discoveredStars,
     focusStar,
     closeModal,
@@ -33,72 +30,6 @@ export function GalaxyExperience() {
     handlePointerUp,
     handleWheel,
   } = useGalaxyCanvas({ enablePinchZoom: true });
-
-  const playHarmonicChime = (ctx: AudioContext, gainNode: GainNode) => {
-    const scale = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25];
-    const freq = scale[Math.floor(Math.random() * scale.length)];
-
-    const osc = ctx.createOscillator();
-    const noteGain = ctx.createGain();
-
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-    noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
-    noteGain.gain.exponentialRampToValueAtTime(0.035, ctx.currentTime + 0.08);
-    noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.8);
-
-    osc.connect(noteGain);
-    noteGain.connect(gainNode);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 3.0);
-  };
-
-  const toggleCosmicAudio = () => {
-    if (isAudioPlaying) {
-      if (chimeIntervalRef.current) {
-        clearInterval(chimeIntervalRef.current);
-        chimeIntervalRef.current = null;
-      }
-      if (masterGainRef.current && audioContextRef.current) {
-        masterGainRef.current.gain.setTargetAtTime(0, audioContextRef.current.currentTime, 0.4);
-        setTimeout(() => {
-          audioContextRef.current?.close();
-          audioContextRef.current = null;
-          masterGainRef.current = null;
-        }, 450);
-      }
-      setIsAudioPlaying(false);
-    } else {
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      const ctx = new AudioCtx();
-      audioContextRef.current = ctx;
-
-      const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(0.01, ctx.currentTime);
-      masterGain.gain.exponentialRampToValueAtTime(0.85, ctx.currentTime + 1.2);
-      masterGain.connect(ctx.destination);
-      masterGainRef.current = masterGain;
-
-      playHarmonicChime(ctx, masterGain);
-      setTimeout(() => {
-        if (audioContextRef.current && masterGainRef.current) {
-          playHarmonicChime(audioContextRef.current, masterGainRef.current);
-        }
-      }, 700);
-
-      chimeIntervalRef.current = window.setInterval(() => {
-        if (audioContextRef.current && masterGainRef.current) {
-          playHarmonicChime(audioContextRef.current, masterGainRef.current);
-        }
-      }, 2400);
-
-      setIsAudioPlaying(true);
-    }
-  };
 
   return (
     <div className="fixed inset-0 h-[100dvh] w-full overflow-hidden bg-black font-sans select-none">
