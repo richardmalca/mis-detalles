@@ -35,6 +35,24 @@ export function OpeningCard({ recipientName, onOpen }: OpeningCardProps) {
         <button
           type="button"
           onClick={onOpen}
+          onPointerDown={() => {
+            try {
+              const AudioCtx =
+                window.AudioContext ||
+                (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+              if (AudioCtx) {
+                const dummyCtx = new AudioCtx();
+                if (dummyCtx.state === "suspended") dummyCtx.resume();
+                const osc = dummyCtx.createOscillator();
+                const gain = dummyCtx.createGain();
+                gain.gain.setValueAtTime(0.0001, dummyCtx.currentTime);
+                osc.connect(gain);
+                gain.connect(dummyCtx.destination);
+                osc.start(0);
+                osc.stop(dummyCtx.currentTime + 0.05);
+              }
+            } catch {}
+          }}
           className="inline-flex w-full sm:w-auto items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-400 to-amber-500 px-7 py-3 text-sm font-bold text-zinc-950 shadow-lg shadow-amber-500/25 transition-transform hover:scale-105 active:scale-95"
         >
           <Heart className="h-4 w-4 fill-zinc-950" />

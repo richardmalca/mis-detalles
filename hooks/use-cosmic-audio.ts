@@ -9,81 +9,82 @@ export function useCosmicAudio() {
   const masterGainRef = useRef<GainNode | null>(null);
 
   const playHarmonicChime = useCallback((ctx: AudioContext, gainNode: GainNode) => {
-    const scale = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25, 783.99];
-    const freq = scale[Math.floor(Math.random() * scale.length)];
+    try {
+      const scale = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25];
+      const freq = scale[Math.floor(Math.random() * scale.length)];
 
-    const osc = ctx.createOscillator();
-    const noteGain = ctx.createGain();
+      const osc = ctx.createOscillator();
+      const noteGain = ctx.createGain();
 
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
 
-    noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
-    noteGain.gain.exponentialRampToValueAtTime(0.09, ctx.currentTime + 0.06);
-    noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.5);
+      noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
+      noteGain.gain.linearRampToValueAtTime(0.12, ctx.currentTime + 0.08);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.5);
 
-    osc.connect(noteGain);
-    noteGain.connect(gainNode);
+      osc.connect(noteGain);
+      noteGain.connect(gainNode);
 
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 2.6);
+      osc.start(ctx.currentTime);
+      osc.stop(ctx.currentTime + 2.6);
+    } catch {}
   }, []);
 
   const start = useCallback(() => {
     try {
-      if (audioCtxRef.current) {
-        if (audioCtxRef.current.state === "suspended") {
-          audioCtxRef.current.resume().then(() => {
-            setIsPlaying(true);
-          });
-          return;
-        }
-        setIsPlaying(true);
-        return;
+      let ctx = audioCtxRef.current;
+      if (!ctx || ctx.state === "closed") {
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        if (!AudioCtx) return;
+        ctx = new AudioCtx();
+        audioCtxRef.current = ctx;
       }
-
-      const AudioCtx =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      if (!AudioCtx) return;
-
-      const ctx = new AudioCtx();
-      audioCtxRef.current = ctx;
 
       if (ctx.state === "suspended") {
         ctx.resume();
       }
 
-      const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(0.01, ctx.currentTime);
-      masterGain.gain.exponentialRampToValueAtTime(0.9, ctx.currentTime + 0.5);
-      masterGain.connect(ctx.destination);
-      masterGainRef.current = masterGain;
+      const buffer = ctx.createBuffer(1, 1, 22050);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(ctx.destination);
+      source.start(0);
 
-      const warmPad = ctx.createOscillator();
-      const padGain = ctx.createGain();
-      warmPad.type = "triangle";
-      warmPad.frequency.setValueAtTime(220, ctx.currentTime);
-      padGain.gain.setValueAtTime(0.04, ctx.currentTime);
-      warmPad.connect(padGain);
-      padGain.connect(masterGain);
-      warmPad.start();
+      if (!masterGainRef.current) {
+        const masterGain = ctx.createGain();
+        masterGain.gain.setValueAtTime(0.85, ctx.currentTime);
+        masterGain.connect(ctx.destination);
+        masterGainRef.current = masterGain;
 
-      playHarmonicChime(ctx, masterGain);
-      setTimeout(() => {
-        if (audioCtxRef.current && masterGainRef.current) {
-          playHarmonicChime(audioCtxRef.current, masterGainRef.current);
-        }
-      }, 500);
+        const warmPad = ctx.createOscillator();
+        const padGain = ctx.createGain();
+        warmPad.type = "sine";
+        warmPad.frequency.setValueAtTime(220, ctx.currentTime);
+        padGain.gain.setValueAtTime(0.05, ctx.currentTime);
+        warmPad.connect(padGain);
+        padGain.connect(masterGain);
+        warmPad.start();
 
-      chimeIntervalRef.current = window.setInterval(() => {
-        if (audioCtxRef.current && masterGainRef.current) {
-          if (audioCtxRef.current.state === "suspended") {
-            audioCtxRef.current.resume();
+        playHarmonicChime(ctx, masterGain);
+
+        setTimeout(() => {
+          if (audioCtxRef.current && masterGainRef.current) {
+            playHarmonicChime(audioCtxRef.current, masterGainRef.current);
           }
-          playHarmonicChime(audioCtxRef.current, masterGainRef.current);
-        }
-      }, 2000);
+        }, 600);
+
+        chimeIntervalRef.current = window.setInterval(() => {
+          if (audioCtxRef.current && masterGainRef.current) {
+            if (audioCtxRef.current.state === "suspended") {
+              audioCtxRef.current.resume();
+            }
+            playHarmonicChime(audioCtxRef.current, masterGainRef.current);
+          }
+        }, 2200);
+      }
 
       setIsPlaying(true);
     } catch {
