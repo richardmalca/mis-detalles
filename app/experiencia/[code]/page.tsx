@@ -32,7 +32,7 @@ export async function generateMetadata({
       (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : null) ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://mis-detalles-three.vercel.app");
 
-    const ogImageUrl = `${baseUrl}/experiencia/${code}/opengraph-image`;
+    const staticOgUrl = `${baseUrl}/og-image.png`;
 
     return {
       title: `${name}, tengo un detalle para ti ${icon} Abre tu universo`,
@@ -43,10 +43,10 @@ export async function generateMetadata({
         type: "website",
         images: [
           {
-            url: ogImageUrl,
+            url: staticOgUrl,
             width: 1200,
             height: 630,
-            alt: `Detalle especial para ${name}`,
+            alt: `Detalle de flores amarillas para ${name}`,
           },
         ],
       },
@@ -54,7 +54,7 @@ export async function generateMetadata({
         card: "summary_large_image",
         title: `${name}, preparé un universo para ti ${icon}`,
         description: `Entra para descubrir las flores amarillas, recuerdos y palabras que te dedico bajo el cosmos.`,
-        images: [ogImageUrl],
+        images: [staticOgUrl],
       },
     };
   } catch {

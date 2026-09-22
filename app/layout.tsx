@@ -35,10 +35,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: `${siteUrl}/opengraph-image`,
+        url: `${siteUrl}/og-image.png`,
         width: 1200,
         height: 630,
-        alt: "Mis Detalles - Flores Amarillas",
+        alt: "Flores Amarillas - Tengo un detalle especial para ti",
       },
     ],
   },
@@ -47,7 +47,7 @@ export const metadata: Metadata = {
     title: "Tengo un detalle especial para ti... ✨🌻",
     description:
       "Abre este enlace para descubrir el universo cósmico, flores amarillas y recuerdos que preparé para ti.",
-    images: [`${siteUrl}/opengraph-image`],
+    images: [`${siteUrl}/og-image.png`],
   },
 };
 
