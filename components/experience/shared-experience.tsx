@@ -68,6 +68,31 @@ export function SharedExperience({
     });
   }
 
+  const restartAutoPlay = useCallback(() => {
+    if (autoPlayTimer.current) {
+      clearInterval(autoPlayTimer.current);
+      autoPlayTimer.current = null;
+    }
+    if (!isAutoPlaying) return;
+
+    autoPlayTimer.current = window.setInterval(() => {
+      setStep((curr) => {
+        if (curr >= totalSteps - 1) {
+          setIsAutoPlaying(false);
+          return curr;
+        }
+        const nxt = curr + 1;
+        if (nxt === totalSteps - 1 && !hasMarkedComplete.current) {
+          hasMarkedComplete.current = true;
+          if (!isCodeCreatedByMe(code)) {
+            supabase.rpc("mark_link_completed", { p_code: code }).then(() => {});
+          }
+        }
+        return nxt;
+      });
+    }, 4800);
+  }, [isAutoPlaying, totalSteps, code]);
+
   const goNext = useCallback(() => {
     setStep((prev) => {
       const next = Math.min(prev + 1, totalSteps - 1);
@@ -79,11 +104,13 @@ export function SharedExperience({
       }
       return next;
     });
-  }, [totalSteps, code]);
+    restartAutoPlay();
+  }, [totalSteps, code, restartAutoPlay]);
 
   const goPrev = useCallback(() => {
     setStep((prev) => Math.max(prev - 1, 0));
-  }, []);
+    restartAutoPlay();
+  }, [restartAutoPlay]);
 
   useEffect(() => {
     if (!isAutoPlaying || !opened) {
@@ -94,20 +121,7 @@ export function SharedExperience({
       return;
     }
 
-    autoPlayTimer.current = window.setInterval(() => {
-      setStep((curr) => {
-        if (curr >= totalSteps - 1) {
-          setIsAutoPlaying(false);
-          return curr;
-        }
-        const nxt = curr + 1;
-        if (nxt === totalSteps - 1 && !hasMarkedComplete.current) {
-          hasMarkedComplete.current = true;
-          supabase.rpc("mark_link_completed", { p_code: code }).then(() => {});
-        }
-        return nxt;
-      });
-    }, 4800);
+    restartAutoPlay();
 
     return () => {
       if (autoPlayTimer.current) {
@@ -115,7 +129,7 @@ export function SharedExperience({
         autoPlayTimer.current = null;
       }
     };
-  }, [isAutoPlaying, opened, totalSteps, code]);
+  }, [isAutoPlaying, opened, restartAutoPlay]);
 
   return (
     <div className="fixed inset-0 h-[100dvh] w-full overflow-hidden bg-black text-white select-none">
