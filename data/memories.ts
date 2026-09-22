@@ -439,11 +439,11 @@ export const MEMORY_STARS: MemoryStar[] = [
   {
     id: "star-22",
     title: "El Año Que Aún No Llega",
-    date: "El próximo 21 de septiembre",
+    date: "En el futuro",
     category: "promise",
     summary: "Otra vuelta al sol, contigo en ella.",
     content:
-      "No sé exactamente dónde estaremos ni qué habrá cambiado, pero prometo que cuando llegue esta fecha otra vez, voy a seguir buscando una forma de recordarte lo que significas.",
+      "No sé exactamente dónde estaremos ni qué habrá cambiado, pero prometo que siempre voy a seguir buscando una forma de recordarte lo que significas.",
     tag: "Continuidad",
     x: 180,
     y: 180,

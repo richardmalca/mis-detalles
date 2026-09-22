@@ -30,13 +30,16 @@ export function useGalaxyCanvas(options?: { enablePinchZoom?: boolean }) {
     } catch {}
   }, []);
 
+  const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
+  const defaultZoom = isMobile ? 0.72 : 1;
+
   const cameraRef = useRef<ViewportCamera>({
     x: 0,
     y: 0,
-    zoom: 1,
+    zoom: defaultZoom,
     targetX: 0,
     targetY: 0,
-    targetZoom: 1,
+    targetZoom: defaultZoom,
     rotationX: 0.15,
     rotationY: 0,
     targetRotationX: 0.15,
@@ -54,7 +57,7 @@ export function useGalaxyCanvas(options?: { enablePinchZoom?: boolean }) {
 
   const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
   const initialPinchDistRef = useRef<number | null>(null);
-  const initialPinchZoomRef = useRef<number>(1);
+  const initialPinchZoomRef = useRef<number>(defaultZoom);
 
   const focusStar = useCallback((star: MemoryStar) => {
     setSelectedStar(star);
@@ -72,21 +75,24 @@ export function useGalaxyCanvas(options?: { enablePinchZoom?: boolean }) {
 
     cameraRef.current.targetRotationY = targetRotY;
     cameraRef.current.targetRotationX = targetRotX;
-    cameraRef.current.targetZoom = 1.35;
+    cameraRef.current.targetZoom = 1.15;
     autoRotateRef.current = false;
   }, []);
 
   const closeModal = useCallback(() => {
     setSelectedStar(null);
+    const mobile = window.innerWidth < 640;
     cameraRef.current.targetRotationX = 0.15;
-    cameraRef.current.targetZoom = 1;
+    cameraRef.current.targetZoom = mobile ? 0.72 : 1;
     autoRotateRef.current = true;
   }, []);
 
   const resetView = useCallback(() => {
+    const mobile = typeof window !== "undefined" && window.innerWidth < 640;
+    const baseZoom = mobile ? 0.72 : 1;
     cameraRef.current.targetX = 0;
     cameraRef.current.targetY = 0;
-    cameraRef.current.targetZoom = 1;
+    cameraRef.current.targetZoom = baseZoom;
     cameraRef.current.targetRotationX = 0.15;
     cameraRef.current.targetRotationY = 0;
     setActiveConstellationId(null);
@@ -95,11 +101,11 @@ export function useGalaxyCanvas(options?: { enablePinchZoom?: boolean }) {
   }, []);
 
   const zoomIn = useCallback(() => {
-    cameraRef.current.targetZoom = clamp(cameraRef.current.targetZoom + 0.25, 0.6, 2.5);
+    cameraRef.current.targetZoom = clamp(cameraRef.current.targetZoom + 0.2, 0.45, 2.5);
   }, []);
 
   const zoomOut = useCallback(() => {
-    cameraRef.current.targetZoom = clamp(cameraRef.current.targetZoom - 0.25, 0.6, 2.5);
+    cameraRef.current.targetZoom = clamp(cameraRef.current.targetZoom - 0.2, 0.45, 2.5);
   }, []);
 
   useEffect(() => {
@@ -112,6 +118,10 @@ export function useGalaxyCanvas(options?: { enablePinchZoom?: boolean }) {
     let animationFrameId: number;
     let width = (canvas.width = window.innerWidth);
     let height = (canvas.height = window.innerHeight);
+
+    const mobile = width < 640;
+    cameraRef.current.zoom = mobile ? 0.72 : 1;
+    cameraRef.current.targetZoom = mobile ? 0.72 : 1;
 
     const handleResize = () => {
       if (!canvas) return;
