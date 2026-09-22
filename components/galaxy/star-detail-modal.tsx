@@ -26,13 +26,13 @@ export function StarDetailModal({ star, onClose }: StarDetailModalProps) {
   return (
     <AnimatePresence>
       {star && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 select-none pointer-events-auto overflow-hidden">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 select-none pointer-events-auto overflow-hidden touch-none overscroll-none">
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/80 backdrop-blur-md"
+            className="absolute inset-0 bg-black/80 backdrop-blur-md touch-none"
           />
 
           <motion.div
@@ -40,7 +40,10 @@ export function StarDetailModal({ star, onClose }: StarDetailModalProps) {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 15 }}
             transition={{ type: "spring", damping: 26, stiffness: 300 }}
-            className="relative w-full max-w-lg max-h-[90vh] overflow-y-auto no-scrollbar rounded-2xl border border-white/15 bg-zinc-950/95 p-5 sm:p-7 shadow-2xl backdrop-blur-2xl"
+            onPointerDown={(e) => e.stopPropagation()}
+            onTouchStart={(e) => e.stopPropagation()}
+            onTouchMove={(e) => e.stopPropagation()}
+            className="relative w-full max-w-[calc(100vw-2rem)] sm:max-w-lg max-h-[90vh] overflow-y-auto overflow-x-hidden no-scrollbar rounded-2xl border border-white/15 bg-zinc-950/95 p-5 sm:p-7 shadow-2xl backdrop-blur-2xl touch-pan-y overscroll-contain"
             style={{
               boxShadow: `0 0 60px -15px ${star.glowColor}`,
             }}
