@@ -24,15 +24,15 @@ $brushDark = New-Object System.Drawing.SolidBrush([System.Drawing.Color]::FromAr
 $sf = New-Object System.Drawing.StringFormat
 $sf.Alignment = [System.Drawing.StringAlignment]::Center
 
-$graphics.DrawString("FLORES AMARILLAS  21 DE MARZO", $fontBadge, $brushYellow, 600, 110, $sf)
-$graphics.DrawString("Tengo un detalle especial para ti", $fontTitle, $brushWhite, 600, 190, $sf)
-$graphics.DrawString("Abre este enlace para descubrir el universo que prepare para ti", $fontSub, $brushYellow, 600, 290, $sf)
+$graphics.DrawString("UN DETALLE ESPECIAL PARA TI", $fontBadge, $brushYellow, 600, 120, $sf)
+$graphics.DrawString("Abre esto para ver lo que prepare", $fontTitle, $brushWhite, 600, 200, $sf)
+$graphics.DrawString("Entre flores, recuerdos y palabras dedicadas para ti", $fontSub, $brushYellow, 600, 300, $sf)
 
-$btnRect = New-Object System.Drawing.Rectangle(360, 400, 480, 80)
+$btnRect = New-Object System.Drawing.Rectangle(360, 405, 480, 75)
 $graphics.FillRectangle($brushYellow, $btnRect)
-$graphics.DrawString("TOCA PARA ABRIR", $fontButton, $brushDark, 600, 425, $sf)
+$graphics.DrawString("TOCA PARA ABRIR", $fontButton, $brushDark, 600, 428, $sf)
 
 $bitmap.Save("d:\Proyectos Personales\mis-detalles\public\og-image.png", [System.Drawing.Imaging.ImageFormat]::Png)
 $graphics.Dispose()
 $bitmap.Dispose()
-Write-Output "PNG_READY"
+Write-Output "PNG_UPDATED"

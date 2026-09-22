@@ -22,7 +22,7 @@ const svg = `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http:/
 
   <rect x="360" y="205" width="480" height="42" rx="21" fill="rgba(251,191,36,0.18)" stroke="rgba(251,191,36,0.5)" stroke-width="1.5" />
   <text x="600" y="233" font-family="-apple-system, system-ui, sans-serif" font-size="19" font-weight="bold" letter-spacing="4" text-anchor="middle" fill="#fde047">
-    TENGO UN DETALLE PARA TI
+    UN DETALLE ESPECIAL PARA TI
   </text>
 
   <text x="600" y="325" font-family="-apple-system, system-ui, sans-serif" font-size="54" font-weight="900" letter-spacing="-1" text-anchor="middle" fill="#ffffff">
