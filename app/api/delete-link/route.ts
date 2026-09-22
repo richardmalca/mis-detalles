@@ -16,47 +16,31 @@ export async function POST(req: NextRequest) {
       (secret && secret === masterSecret) ||
       (pin && masterPin && pin.trim() === masterPin.trim());
 
-    if (isMaster) {
-      const { error } = await supabase
-        .from("love_links")
-        .delete()
-        .eq("code", code.trim());
+    if (isMaster && masterSecret) {
+      const { data, error } = await supabase.rpc("admin_delete_link", {
+        p_code: code.trim(),
+        p_secret: masterSecret,
+      });
 
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+      if (error || !data) {
+        return NextResponse.json({ error: "No se pudo eliminar el link" }, { status: 500 });
       }
       return NextResponse.json({ success: true });
     }
 
     if (pin && typeof pin === "string") {
-      const { data: myLinks, error: rpcError } = await supabase.rpc("get_my_links", {
+      const { data, error } = await supabase.rpc("delete_my_link", {
+        p_code: code.trim(),
         p_pin: pin.trim(),
       });
 
-      if (!rpcError && Array.isArray(myLinks)) {
-        const ownsLink = myLinks.some((l: { code: string }) => l.code === code.trim());
-        if (ownsLink) {
-          const { error: delErr } = await supabase
-            .from("love_links")
-            .delete()
-            .eq("code", code.trim());
-
-          if (!delErr) {
-            return NextResponse.json({ success: true });
-          }
-        }
+      if (error || !data) {
+        return NextResponse.json(
+          { error: "No se pudo eliminar el link (no te pertenece o ya no existe)" },
+          { status: 403 }
+        );
       }
-
-      const { error: fallbackDel } = await supabase
-        .from("love_links")
-        .delete()
-        .eq("code", code.trim());
-
-      if (!fallbackDel) {
-        return NextResponse.json({ success: true });
-      }
-
-      return NextResponse.json({ error: "No se pudo eliminar el link" }, { status: 403 });
+      return NextResponse.json({ success: true });
     }
 
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
