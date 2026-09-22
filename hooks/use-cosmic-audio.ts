@@ -40,8 +40,8 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
       oscHarmonic.frequency.setValueAtTime(freq * 2, ctx.currentTime);
 
       noteGain.gain.setValueAtTime(0.001, ctx.currentTime);
-      noteGain.gain.linearRampToValueAtTime(0.045, ctx.currentTime + 0.05);
-      noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.6);
+      noteGain.gain.linearRampToValueAtTime(0.14, ctx.currentTime + 0.04);
+      noteGain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 2.5);
 
       osc.connect(noteGain);
       oscHarmonic.connect(noteGain);
@@ -49,8 +49,8 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
 
       osc.start(ctx.currentTime);
       oscHarmonic.start(ctx.currentTime);
-      osc.stop(ctx.currentTime + 2.7);
-      oscHarmonic.stop(ctx.currentTime + 2.7);
+      osc.stop(ctx.currentTime + 2.6);
+      oscHarmonic.stop(ctx.currentTime + 2.6);
     } catch {}
   }, []);
 
@@ -78,7 +78,7 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
 
       if (!masterGainRef.current) {
         const masterGain = ctx.createGain();
-        masterGain.gain.setValueAtTime(0.7, ctx.currentTime);
+        masterGain.gain.setValueAtTime(0.85, ctx.currentTime);
         masterGain.connect(ctx.destination);
         masterGainRef.current = masterGain;
 
@@ -88,7 +88,7 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
           if (audioCtxRef.current && masterGainRef.current) {
             playHarmonicChime(audioCtxRef.current, masterGainRef.current);
           }
-        }, 700);
+        }, 500);
 
         chimeIntervalRef.current = window.setInterval(() => {
           if (audioCtxRef.current && masterGainRef.current) {
@@ -97,7 +97,10 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
             }
             playHarmonicChime(audioCtxRef.current, masterGainRef.current);
           }
-        }, 2400);
+        }, 2200);
+      } else {
+        masterGainRef.current.gain.cancelScheduledValues(ctx.currentTime);
+        masterGainRef.current.gain.setValueAtTime(0.85, ctx.currentTime);
       }
 
       setIsPlaying(true);
@@ -113,13 +116,12 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
     }
     if (masterGainRef.current && audioCtxRef.current) {
       try {
-        masterGainRef.current.gain.setTargetAtTime(0, audioCtxRef.current.currentTime, 0.25);
-        setTimeout(() => {
-          audioCtxRef.current?.close().catch(() => {});
-          audioCtxRef.current = null;
-          masterGainRef.current = null;
-        }, 300);
+        masterGainRef.current.gain.cancelScheduledValues(audioCtxRef.current.currentTime);
+        masterGainRef.current.gain.setValueAtTime(0, audioCtxRef.current.currentTime);
+        audioCtxRef.current.close().catch(() => {});
       } catch {}
+      audioCtxRef.current = null;
+      masterGainRef.current = null;
     }
     setIsPlaying(false);
   }, []);
@@ -163,35 +165,24 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
-        if (isPlaying) {
+        if (userWantsAudioRef.current && audioCtxRef.current) {
           wasPlayingBeforeHiddenRef.current = true;
-          internalStop();
+          audioCtxRef.current.suspend().catch(() => {});
+          setIsPlaying(false);
         }
       } else {
         if (wasPlayingBeforeHiddenRef.current && userWantsAudioRef.current) {
           wasPlayingBeforeHiddenRef.current = false;
-          internalStart();
+          if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
+            audioCtxRef.current.resume().then(() => setIsPlaying(true)).catch(() => {});
+          } else {
+            internalStart();
+          }
         }
       }
     };
 
-    const handleWindowBlur = () => {
-      if (isPlaying) {
-        wasPlayingBeforeHiddenRef.current = true;
-        internalStop();
-      }
-    };
-
-    const handleWindowFocus = () => {
-      if (wasPlayingBeforeHiddenRef.current && userWantsAudioRef.current && !document.hidden) {
-        wasPlayingBeforeHiddenRef.current = false;
-        internalStart();
-      }
-    };
-
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    window.addEventListener("blur", handleWindowBlur);
-    window.addEventListener("focus", handleWindowFocus);
 
     const handleUserGesture = () => {
       if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
@@ -207,20 +198,21 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
-      window.removeEventListener("blur", handleWindowBlur);
-      window.removeEventListener("focus", handleWindowFocus);
       window.removeEventListener("touchstart", handleUserGesture);
       window.removeEventListener("touchend", handleUserGesture);
       window.removeEventListener("click", handleUserGesture);
 
       if (chimeIntervalRef.current) {
         clearInterval(chimeIntervalRef.current);
+        chimeIntervalRef.current = null;
       }
       if (audioCtxRef.current) {
         audioCtxRef.current.close().catch(() => {});
+        audioCtxRef.current = null;
+        masterGainRef.current = null;
       }
     };
-  }, [isPlaying, internalStart, internalStop]);
+  }, [internalStart]);
 
   return { isPlaying, start, stop, toggle };
 }
