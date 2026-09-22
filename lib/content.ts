@@ -20,8 +20,10 @@ const STORY_COUNT = 60;
 type StorySlots = {
   openers: string[];
   developments: string[];
+  secondDevelopments: string[];
   realizations: string[];
   flowerLines: ((item: string) => string)[];
+  gratitudeLines: string[];
   promiseLines: ((name: string) => string)[];
   closingLines: string[];
 };
@@ -36,8 +38,10 @@ function buildStory(
   return [
     slots.openers[i % slots.openers.length],
     slots.developments[(i * 7 + 3) % slots.developments.length],
+    slots.secondDevelopments[(i * 23 + 7) % slots.secondDevelopments.length],
     slots.realizations[(i * 13 + 5) % slots.realizations.length],
     slots.flowerLines[(i * 11 + 2) % slots.flowerLines.length](item),
+    slots.gratitudeLines[(i * 29 + 9) % slots.gratitudeLines.length],
     slots.promiseLines[(i * 17 + 1) % slots.promiseLines.length](name),
     slots.closingLines[(i * 19 + 4) % slots.closingLines.length],
   ];
@@ -78,6 +82,23 @@ const AMOR_SLOTS: StorySlots = {
     "Empecé a entender que esto no se trataba de encontrar perfección, sino de encontrar a alguien con quien todo fluye distinto.",
     "Con cada semana que pasaba, la certeza de que esto era real se hacía más grande.",
   ],
+  secondDevelopments: [
+    "Con el paso de los meses, lo que sentía dejó de parecerme una sorpresa y empezó a sentirse como parte de mi vida.",
+    "Empecé a notar que las cosas buenas se sentían más completas cuando las vivía contigo.",
+    "Fui aprendiendo que no hacía falta un motivo especial para querer estar cerca; cualquier día servía.",
+    "Con el tiempo, dejé de contar las señales y simplemente empecé a confiar en lo que sentía.",
+    "Cada detalle pequeño que compartíamos se fue acumulando hasta convertirse en algo que ya no podía ignorar.",
+    "Empecé a notar que mis mejores días casi siempre tenían algo que ver contigo.",
+    "Con el tiempo entendí que no necesitaba definir todo de inmediato; bastaba con disfrutar cómo iba creciendo.",
+    "Fui descubriendo que las cosas simples, hechas contigo, dejaban de sentirse simples.",
+    "Cada semana que pasaba confirmaba algo que ya sospechaba desde el principio.",
+    "Empecé a preferir los planes tranquilos contigo por encima de cualquier otro plan más llamativo.",
+    "Con el tiempo, dejé de preguntarme si esto era casualidad y empecé a aceptar que era simplemente bueno.",
+    "Fui notando que hasta las conversaciones más triviales contigo se sentían importantes.",
+    "Cada vez que pasaba tiempo contigo, confirmaba que no quería que eso cambiara.",
+    "Con el paso del tiempo, entendí que no hacía falta forzar nada para que esto se sintiera bien.",
+    "Empecé a construir, sin planearlo, una costumbre que hoy no cambiaría por nada.",
+  ],
   realizations: [
     "Fue entonces cuando entendí que esto no era una casualidad más, sino algo que valía la pena cuidar de verdad.",
     "En algún punto dejé de preguntarme si esto iba a durar y empecé a simplemente disfrutarlo como venía.",
@@ -111,6 +132,23 @@ const AMOR_SLOTS: StorySlots = {
     (item) => `Cada detalle de estos ${item} representa una razón distinta por la que esto sigue valiendo la pena.`,
     (item) => `Hoy elegí estos ${item} porque me recuerdan a la calidez que solo tú sabes dar.`,
     (item) => `Estos ${item} de este día llevan un mensaje simple: gracias por seguir aquí.`,
+  ],
+  gratitudeLines: [
+    "Hoy quiero hacer una pausa solo para agradecer que esto exista, tal como es.",
+    "Antes de seguir, quería detenerme un momento para decir simplemente: gracias por estar aquí.",
+    "No quiero dar esto por sentado, así que hoy quiero decirlo con todas sus letras: lo valoro mucho.",
+    "Hay algo que quiero dejar claro antes de continuar: esto significa más de lo que normalmente digo.",
+    "Antes de cerrar esta historia, quiero agradecer en voz alta algo que normalmente solo pienso en silencio.",
+    "Hoy quiero tomarme un momento para reconocer, sin rodeos, lo afortunado que me siento.",
+    "No quería dejar pasar la oportunidad de decir esto claramente: agradezco cada parte de esto.",
+    "Antes de terminar, quiero ser honesto: no doy esto por sentado ni un solo día.",
+    "Hoy simplemente quiero decir gracias, sin ninguna otra intención detrás.",
+    "Quería hacer una pausa en esta historia solo para reconocer lo bien que se siente todo esto.",
+    "Antes de seguir adelante, quiero dejar constancia de algo simple: esto vale mucho para mí.",
+    "Hoy quiero ser directo: agradezco esto más de lo que normalmente demuestro.",
+    "No quiero que este momento pase sin decir, claramente, cuánto aprecio todo esto.",
+    "Antes del final, quiero detenerme a agradecer, sin adornos, lo que tenemos.",
+    "Hoy simplemente quiero reconocer en voz alta algo que suelo sentir en silencio.",
   ],
   promiseLines: [
     (n) => `Por eso hoy, ${n}, quiero prometerte que voy a seguir eligiéndote, incluso en los días difíciles.`,
@@ -183,6 +221,23 @@ const AMISTAD_SLOTS: StorySlots = {
     "Empecé a entender que esto no se trataba de tener todo en común, sino de tener a alguien con quien todo fluye distinto.",
     "Con cada año que pasaba, la certeza de que esta amistad iba a durar se hacía más grande.",
   ],
+  secondDevelopments: [
+    "Con el paso de los meses, esta amistad dejó de sentirse como una sorpresa y empezó a sentirse como parte de mi vida.",
+    "Empecé a notar que las buenas noticias se sentían más completas cuando te las contaba a ti.",
+    "Fui aprendiendo que no hacía falta un motivo especial para escribirte; cualquier día servía.",
+    "Con el tiempo, dejé de contar las coincidencias y simplemente empecé a confiar en esta amistad.",
+    "Cada detalle pequeño que compartíamos se fue acumulando hasta convertirse en algo que ya no podía ignorar.",
+    "Empecé a notar que mis mejores anécdotas casi siempre tenían algo que ver contigo.",
+    "Con el tiempo entendí que no necesitaba vernos seguido para que esta amistad siguiera creciendo.",
+    "Fui descubriendo que las cosas simples, hechas contigo, dejaban de sentirse simples.",
+    "Cada año que pasaba confirmaba algo que ya sospechaba desde el principio.",
+    "Empecé a preferir las conversaciones tranquilas contigo por encima de cualquier otro plan más llamativo.",
+    "Con el tiempo, dejé de preguntarme si esto iba a durar y empecé a aceptar que simplemente era bueno.",
+    "Fui notando que hasta las conversaciones más triviales contigo se sentían importantes.",
+    "Cada vez que hablaba contigo, confirmaba que no quería que eso cambiara.",
+    "Con el paso del tiempo, entendí que no hacía falta forzar nada para que esta amistad se sintiera bien.",
+    "Empecé a construir, sin planearlo, una costumbre que hoy no cambiaría por nada.",
+  ],
   realizations: [
     "Fue entonces cuando entendí que esto no era una coincidencia más, sino algo que valía la pena cuidar de verdad.",
     "En algún punto dejé de preguntarme si esto iba a durar y empecé a simplemente disfrutarlo como venía.",
@@ -216,6 +271,23 @@ const AMISTAD_SLOTS: StorySlots = {
     (item) => `Cada detalle de estos ${item} representa una razón distinta por la que esta amistad sigue valiendo la pena.`,
     (item) => `Hoy elegí estos ${item} porque me recuerdan a la calidez que solo un buen amigo sabe dar.`,
     (item) => `Estos ${item} de este día llevan un mensaje simple: gracias por seguir aquí.`,
+  ],
+  gratitudeLines: [
+    "Hoy quiero hacer una pausa solo para agradecer que esta amistad exista, tal como es.",
+    "Antes de seguir, quería detenerme un momento para decir simplemente: gracias por estar aquí.",
+    "No quiero dar esta amistad por sentada, así que hoy quiero decirlo con todas sus letras: la valoro mucho.",
+    "Hay algo que quiero dejar claro antes de continuar: esta amistad significa más de lo que normalmente digo.",
+    "Antes de cerrar esta historia, quiero agradecer en voz alta algo que normalmente solo pienso en silencio.",
+    "Hoy quiero tomarme un momento para reconocer, sin rodeos, lo afortunado que me siento de tenerte como amigo.",
+    "No quería dejar pasar la oportunidad de decir esto claramente: agradezco cada parte de esta amistad.",
+    "Antes de terminar, quiero ser honesto: no doy esta amistad por sentada ni un solo día.",
+    "Hoy simplemente quiero decir gracias, sin ninguna otra intención detrás.",
+    "Quería hacer una pausa en esta historia solo para reconocer lo bien que se siente esta amistad.",
+    "Antes de seguir adelante, quiero dejar constancia de algo simple: esta amistad vale mucho para mí.",
+    "Hoy quiero ser directo: agradezco esta amistad más de lo que normalmente demuestro.",
+    "No quiero que este momento pase sin decir, claramente, cuánto aprecio esta amistad.",
+    "Antes del final, quiero detenerme a agradecer, sin adornos, lo que tenemos.",
+    "Hoy simplemente quiero reconocer en voz alta algo que suelo sentir en silencio.",
   ],
   promiseLines: [
     (n) => `Por eso hoy, ${n}, quiero prometerte que voy a seguir estando presente, incluso en los días difíciles.`,
