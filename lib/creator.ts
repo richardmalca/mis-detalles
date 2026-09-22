@@ -52,10 +52,6 @@ export function isCodeCreatedByMe(code: string): boolean {
     if (Array.isArray(existing) && existing.includes(code)) {
       return true;
     }
-    const creator = getStoredCreator();
-    if (creator?.id) {
-      return true;
-    }
     return false;
   } catch {
     return false;

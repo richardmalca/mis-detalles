@@ -264,22 +264,27 @@ function PanelContent() {
                         </span>
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         {row.opened_at ? (
-                          <span className="flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 px-2.5 py-0.5 text-[11px] font-semibold text-emerald-300">
-                            <CheckCircle2 className="h-3 w-3 text-emerald-400" />
-                            <span>Visto {row.open_count > 1 ? `(${row.open_count} veces)` : ""}</span>
+                          <span className="flex items-center gap-1 rounded-full bg-emerald-500/15 border border-emerald-500/35 px-3 py-1 text-xs font-semibold text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.15)]">
+                            <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+                            <span>
+                              {row.open_count === 1
+                                ? "Abierto 1 vez"
+                                : `Abierto ${row.open_count} veces`}
+                            </span>
                           </span>
                         ) : (
-                          <span className="flex items-center gap-1 rounded-full bg-zinc-800/80 px-2.5 py-0.5 text-[11px] text-zinc-400">
+                          <span className="flex items-center gap-1 rounded-full bg-zinc-800/80 border border-white/5 px-2.5 py-0.5 text-[11px] text-zinc-400">
                             <Clock className="h-3 w-3" />
                             <span>Sin abrir</span>
                           </span>
                         )}
 
                         {row.completed_at && (
-                          <span className="rounded-full bg-amber-500/15 border border-amber-500/30 px-2.5 py-0.5 text-[11px] font-semibold text-amber-300">
-                            Leyó todo ✨
+                          <span className="flex items-center gap-1 rounded-full bg-amber-500/15 border border-amber-500/35 px-2.5 py-1 text-xs font-semibold text-amber-300 shadow-[0_0_12px_rgba(251,191,36,0.15)]">
+                            <Sparkles className="h-3 w-3 text-amber-400" />
+                            <span>Leyó todo ✨</span>
                           </span>
                         )}
                       </div>
@@ -314,13 +319,13 @@ function PanelContent() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between text-[11px] text-zinc-500 pt-1">
+                    <div className="flex flex-wrap items-center justify-between gap-y-1 text-[11px] text-zinc-500 pt-1 border-t border-white/5">
                       <span className="flex items-center gap-1">
-                        <Calendar className="h-3 w-3" /> Creado: {formatDate(row.created_at)}
+                        <Calendar className="h-3 w-3 text-zinc-400" /> Creado: {formatDate(row.created_at)}
                       </span>
                       {row.opened_at && (
-                        <span className="flex items-center gap-1 text-zinc-400">
-                          <Eye className="h-3 w-3 text-emerald-400" /> Última apertura: {formatDate(row.opened_at)}
+                        <span className="flex items-center gap-1 text-emerald-400/90 font-medium">
+                          <Eye className="h-3 w-3 text-emerald-400" /> Lecturas: <strong>{row.open_count}</strong> · Última: {formatDate(row.opened_at)}
                         </span>
                       )}
                     </div>
