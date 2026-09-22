@@ -10,7 +10,9 @@ import { Heart, MousePointerClick, Move3d } from "lucide-react";
 import { useCosmicAudio } from "@/hooks/use-cosmic-audio";
 
 export function GalaxyExperience() {
-  const { isPlaying: isAudioPlaying, toggle: toggleCosmicAudio } = useCosmicAudio();
+  const { isPlaying: isAudioPlaying, toggle: toggleCosmicAudio } = useCosmicAudio({
+    autoStartIfSaved: true,
+  });
 
   const {
     canvasRef,

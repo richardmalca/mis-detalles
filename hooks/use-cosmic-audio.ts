@@ -2,11 +2,16 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 
-export function useCosmicAudio() {
+const AUDIO_PREF_KEY = "mdt_audio_enabled";
+
+export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved?: boolean }) {
+  const storageKey = options?.storageKey || AUDIO_PREF_KEY;
   const [isPlaying, setIsPlaying] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
   const chimeIntervalRef = useRef<number | null>(null);
   const masterGainRef = useRef<GainNode | null>(null);
+  const userWantsAudioRef = useRef<boolean>(false);
+  const wasPlayingBeforeHiddenRef = useRef<boolean>(false);
 
   const playHarmonicChime = useCallback((ctx: AudioContext, gainNode: GainNode) => {
     try {
@@ -49,7 +54,7 @@ export function useCosmicAudio() {
     } catch {}
   }, []);
 
-  const start = useCallback(() => {
+  const internalStart = useCallback(() => {
     try {
       let ctx = audioCtxRef.current;
       if (!ctx || ctx.state === "closed") {
@@ -101,7 +106,7 @@ export function useCosmicAudio() {
     }
   }, [playHarmonicChime]);
 
-  const stop = useCallback(() => {
+  const internalStop = useCallback(() => {
     if (chimeIntervalRef.current) {
       clearInterval(chimeIntervalRef.current);
       chimeIntervalRef.current = null;
@@ -119,6 +124,22 @@ export function useCosmicAudio() {
     setIsPlaying(false);
   }, []);
 
+  const start = useCallback(() => {
+    userWantsAudioRef.current = true;
+    try {
+      window.localStorage.setItem(storageKey, "true");
+    } catch {}
+    internalStart();
+  }, [storageKey, internalStart]);
+
+  const stop = useCallback(() => {
+    userWantsAudioRef.current = false;
+    try {
+      window.localStorage.setItem(storageKey, "false");
+    } catch {}
+    internalStop();
+  }, [storageKey, internalStop]);
+
   const toggle = useCallback(() => {
     if (isPlaying) {
       stop();
@@ -128,19 +149,70 @@ export function useCosmicAudio() {
   }, [isPlaying, start, stop]);
 
   useEffect(() => {
-    const handleFirstTouch = () => {
-      if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
-        audioCtxRef.current.resume();
+    try {
+      const saved = window.localStorage.getItem(storageKey);
+      if (saved === "true") {
+        userWantsAudioRef.current = true;
+        if (options?.autoStartIfSaved) {
+          internalStart();
+        }
+      }
+    } catch {}
+  }, [storageKey, options?.autoStartIfSaved, internalStart]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        if (isPlaying) {
+          wasPlayingBeforeHiddenRef.current = true;
+          internalStop();
+        }
+      } else {
+        if (wasPlayingBeforeHiddenRef.current && userWantsAudioRef.current) {
+          wasPlayingBeforeHiddenRef.current = false;
+          internalStart();
+        }
       }
     };
-    window.addEventListener("touchstart", handleFirstTouch, { passive: true });
-    window.addEventListener("touchend", handleFirstTouch, { passive: true });
-    window.addEventListener("click", handleFirstTouch, { passive: true });
+
+    const handleWindowBlur = () => {
+      if (isPlaying) {
+        wasPlayingBeforeHiddenRef.current = true;
+        internalStop();
+      }
+    };
+
+    const handleWindowFocus = () => {
+      if (wasPlayingBeforeHiddenRef.current && userWantsAudioRef.current && !document.hidden) {
+        wasPlayingBeforeHiddenRef.current = false;
+        internalStart();
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+    window.addEventListener("focus", handleWindowFocus);
+
+    const handleUserGesture = () => {
+      if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
+        audioCtxRef.current.resume();
+      } else if (userWantsAudioRef.current && !masterGainRef.current) {
+        internalStart();
+      }
+    };
+
+    window.addEventListener("touchstart", handleUserGesture, { passive: true });
+    window.addEventListener("touchend", handleUserGesture, { passive: true });
+    window.addEventListener("click", handleUserGesture, { passive: true });
 
     return () => {
-      window.removeEventListener("touchstart", handleFirstTouch);
-      window.removeEventListener("touchend", handleFirstTouch);
-      window.removeEventListener("click", handleFirstTouch);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+      window.removeEventListener("focus", handleWindowFocus);
+      window.removeEventListener("touchstart", handleUserGesture);
+      window.removeEventListener("touchend", handleUserGesture);
+      window.removeEventListener("click", handleUserGesture);
+
       if (chimeIntervalRef.current) {
         clearInterval(chimeIntervalRef.current);
       }
@@ -148,7 +220,7 @@ export function useCosmicAudio() {
         audioCtxRef.current.close().catch(() => {});
       }
     };
-  }, []);
+  }, [isPlaying, internalStart, internalStop]);
 
   return { isPlaying, start, stop, toggle };
 }
