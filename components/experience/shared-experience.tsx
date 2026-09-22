@@ -53,9 +53,9 @@ export function SharedExperience({
   const totalSteps = 1 + content.phrases.length + 1;
 
   function handleOpen() {
+    startAudio();
     setOpened(true);
     setIsAutoPlaying(true);
-    startAudio();
     supabase.rpc("mark_link_opened", { p_code: code }).then(() => {});
     confetti({
       particleCount: 40,
