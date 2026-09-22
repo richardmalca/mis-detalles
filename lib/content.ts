@@ -22,7 +22,7 @@ type StorySlots = {
   developments: string[];
   secondDevelopments: string[];
   realizations: string[];
-  flowerLines: ((item: string) => string)[];
+  flowerLines: ((occasion: Occasion) => string)[];
   gratitudeLines: string[];
   promiseLines: ((name: string) => string)[];
   closingLines: string[];
@@ -32,7 +32,7 @@ function buildStory(
   slots: StorySlots,
   index: number,
   name: string,
-  item: string
+  occasion: Occasion
 ): string[] {
   const i = index % STORY_COUNT;
   return [
@@ -40,7 +40,7 @@ function buildStory(
     slots.developments[(i * 7 + 3) % slots.developments.length],
     slots.secondDevelopments[(i * 23 + 7) % slots.secondDevelopments.length],
     slots.realizations[(i * 13 + 5) % slots.realizations.length],
-    slots.flowerLines[(i * 11 + 2) % slots.flowerLines.length](item),
+    slots.flowerLines[(i * 11 + 2) % slots.flowerLines.length](occasion),
     slots.gratitudeLines[(i * 29 + 9) % slots.gratitudeLines.length],
     slots.promiseLines[(i * 17 + 1) % slots.promiseLines.length](name),
     slots.closingLines[(i * 19 + 4) % slots.closingLines.length],
@@ -117,21 +117,21 @@ const AMOR_SLOTS: StorySlots = {
     "Comprendí, sin mucho drama, que esto era simplemente lo que se siente cuando algo está bien.",
   ],
   flowerLines: [
-    (item) => `Los ${item} de hoy representan justamente eso: una promesa de quedarse, de iluminar y de acompañar.`,
-    (item) => `Hoy, en este día, quiero que sepas que cada detalle de estos ${item} representa un motivo distinto para agradecerte.`,
-    (item) => `Dicen que ${item} como estos simbolizan lealtad y calidez, y no se me ocurre mejor forma de describir lo que siento.`,
-    (item) => `Estos ${item} de este día son solo un símbolo pequeño de algo que siento todos los días, no solo hoy.`,
-    (item) => `Hoy estos ${item} me recordaron exactamente a la calidez que trajiste a mi vida.`,
-    (item) => `Elegí estos ${item} porque representan justo lo que quiero decirte sin necesitar muchas palabras.`,
-    (item) => `En este día, quise encontrar una forma de decir gracias que se sintiera tan sincera como estos ${item}.`,
-    (item) => `Estos ${item} no alcanzan para explicar todo lo que significas, pero son un buen punto de partida.`,
-    (item) => `Hoy quise regalarte algo simple: unos ${item} y una historia real detrás de ellos.`,
-    (item) => `Estos ${item} me parecieron la forma correcta de representar lo que siento cuando pienso en ti.`,
-    (item) => `Estos ${item} representan una promesa silenciosa: la de seguir eligiéndote, día tras día.`,
-    (item) => `En este día, quise que supieras que sigues siendo mi motivo favorito para celebrar algo, como estos ${item} lo celebran hoy.`,
-    (item) => `Cada detalle de estos ${item} representa una razón distinta por la que esto sigue valiendo la pena.`,
-    (item) => `Hoy elegí estos ${item} porque me recuerdan a la calidez que solo tú sabes dar.`,
-    (item) => `Estos ${item} de este día llevan un mensaje simple: gracias por seguir aquí.`,
+    (o) => `${o.defArticle} ${o.itemName} de hoy representan justamente eso: una promesa de quedarse, de iluminar y de acompañar.`,
+    (o) => `Hoy, en este día, quiero que sepas que cada detalle de ${o.demArticle.toLowerCase()} ${o.itemName} representa un motivo distinto para agradecerte.`,
+    (o) => `Dicen que ${o.itemName} como estas simbolizan lealtad y calidez, y no se me ocurre mejor forma de describir lo que siento.`,
+    (o) => `${o.demArticle} ${o.itemName} de este día son solo un símbolo pequeño de algo que siento todos los días, no solo hoy.`,
+    (o) => `Hoy ${o.demArticle.toLowerCase()} ${o.itemName} me recordaron exactamente a la calidez que trajiste a mi vida.`,
+    (o) => `Elegí ${o.demArticle.toLowerCase()} ${o.itemName} porque representan justo lo que quiero decirte sin necesitar muchas palabras.`,
+    (o) => `En este día, quise encontrar una forma de decir gracias que se sintiera tan sincera como ${o.demArticle.toLowerCase()} ${o.itemName}.`,
+    (o) => `${o.demArticle} ${o.itemName} no alcanzan para explicar todo lo que significas, pero son un buen punto de partida.`,
+    (o) => `Hoy quise regalarte algo simple: ${o.itemName} y una historia real detrás de ellos.`,
+    (o) => `${o.demArticle} ${o.itemName} me parecieron la forma correcta de representar lo que siento cuando pienso en ti.`,
+    (o) => `${o.demArticle} ${o.itemName} representan una promesa silenciosa: la de seguir eligiéndote, día tras día.`,
+    (o) => `En este día, quise que supieras que sigues siendo mi motivo favorito para celebrar algo, como ${o.demArticle.toLowerCase()} ${o.itemName} lo celebran hoy.`,
+    (o) => `Cada detalle de ${o.demArticle.toLowerCase()} ${o.itemName} representa una razón distinta por la que esto sigue valiendo la pena.`,
+    (o) => `Hoy elegí ${o.demArticle.toLowerCase()} ${o.itemName} porque me recuerdan a la calidez que solo tú sabes dar.`,
+    (o) => `${o.demArticle} ${o.itemName} de este día llevan un mensaje simple: gracias por seguir aquí.`,
   ],
   gratitudeLines: [
     "Hoy quiero hacer una pausa solo para agradecer que esto exista, tal como es.",
@@ -256,21 +256,21 @@ const AMISTAD_SLOTS: StorySlots = {
     "Comprendí, sin mucho drama, que esto era simplemente lo que se siente cuando una amistad está bien construida.",
   ],
   flowerLines: [
-    (item) => `Los ${item} de hoy representan justamente eso: lealtad, calidez y una amistad que permanece.`,
-    (item) => `Hoy, en este día, quiero que sepas que estos ${item} representan un motivo distinto para agradecerte.`,
-    (item) => `Dicen que ${item} como estos simbolizan lealtad incondicional, y no se me ocurre mejor forma de describir esta amistad.`,
-    (item) => `Estos ${item} de este día son solo un símbolo pequeño de algo que valoro todos los días, no solo hoy.`,
-    (item) => `Hoy estos ${item} me recordaron exactamente a la calidez que trajiste a mi vida como amigo.`,
-    (item) => `Elegí estos ${item} porque representan justo lo que quiero decirte sin necesitar muchas palabras.`,
-    (item) => `En este día, quise encontrar una forma de decir gracias que se sintiera tan sincera como esta amistad, como estos ${item}.`,
-    (item) => `Estos ${item} no alcanzan para explicar todo lo que significa esta amistad, pero son un buen punto de partida.`,
-    (item) => `Hoy quise regalarte algo simple: unos ${item} y una historia real detrás de ellos.`,
-    (item) => `Estos ${item} me parecieron la forma correcta de representar el valor de esta amistad.`,
-    (item) => `Estos ${item} representan una promesa silenciosa: la de seguir estando presente, pase lo que pase.`,
-    (item) => `En este día, quise que supieras que sigues siendo una de las personas que más aprecio, como celebran estos ${item} hoy.`,
-    (item) => `Cada detalle de estos ${item} representa una razón distinta por la que esta amistad sigue valiendo la pena.`,
-    (item) => `Hoy elegí estos ${item} porque me recuerdan a la calidez que solo un buen amigo sabe dar.`,
-    (item) => `Estos ${item} de este día llevan un mensaje simple: gracias por seguir aquí.`,
+    (o) => `${o.defArticle} ${o.itemName} de hoy representan justamente eso: lealtad, calidez y una amistad que permanece.`,
+    (o) => `Hoy, en este día, quiero que sepas que ${o.demArticle.toLowerCase()} ${o.itemName} representan un motivo distinto para agradecerte.`,
+    (o) => `Dicen que ${o.itemName} como estas simbolizan lealtad incondicional, y no se me ocurre mejor forma de describir esta amistad.`,
+    (o) => `${o.demArticle} ${o.itemName} de este día son solo un símbolo pequeño de algo que valoro todos los días, no solo hoy.`,
+    (o) => `Hoy ${o.demArticle.toLowerCase()} ${o.itemName} me recordaron exactamente a la calidez que trajiste a mi vida como amigo.`,
+    (o) => `Elegí ${o.demArticle.toLowerCase()} ${o.itemName} porque representan justo lo que quiero decirte sin necesitar muchas palabras.`,
+    (o) => `En este día, quise encontrar una forma de decir gracias que se sintiera tan sincera como esta amistad, como ${o.demArticle.toLowerCase()} ${o.itemName}.`,
+    (o) => `${o.demArticle} ${o.itemName} no alcanzan para explicar todo lo que significa esta amistad, pero son un buen punto de partida.`,
+    (o) => `Hoy quise regalarte algo simple: ${o.itemName} y una historia real detrás de ellos.`,
+    (o) => `${o.demArticle} ${o.itemName} me parecieron la forma correcta de representar el valor de esta amistad.`,
+    (o) => `${o.demArticle} ${o.itemName} representan una promesa silenciosa: la de seguir estando presente, pase lo que pase.`,
+    (o) => `En este día, quise que supieras que sigues siendo una de las personas que más aprecio, como celebran ${o.demArticle.toLowerCase()} ${o.itemName} hoy.`,
+    (o) => `Cada detalle de ${o.demArticle.toLowerCase()} ${o.itemName} representa una razón distinta por la que esta amistad sigue valiendo la pena.`,
+    (o) => `Hoy elegí ${o.demArticle.toLowerCase()} ${o.itemName} porque me recuerdan a la calidez que solo un buen amigo sabe dar.`,
+    (o) => `${o.demArticle} ${o.itemName} de este día llevan un mensaje simple: gracias por seguir aquí.`,
   ],
   gratitudeLines: [
     "Hoy quiero hacer una pausa solo para agradecer que esta amistad exista, tal como es.",
@@ -338,9 +338,9 @@ function amor(
     badge: `${occasion.emoji} para ti`,
     intro:
       "Si alguna vez te has preguntado cómo comenzó todo, esta es la historia de cómo cambiaste mi cielo.",
-    phrases: buildStory(AMOR_SLOTS, index, name, occasion.itemName),
+    phrases: buildStory(AMOR_SLOTS, index, name, occasion),
     finalTitle: `${name}, gracias por ser mi hogar y mi lugar favorito.`,
-    finalMessage: `Que estos ${occasion.itemName} te recuerden siempre lo inmensamente especial que eres en mi vida.`,
+    finalMessage: `Que ${occasion.demArticle.toLowerCase()} ${occasion.itemName} te recuerden siempre lo inmensamente especial que eres en mi vida.`,
     formPrompt: FORM_PROMPT,
   };
 }
@@ -354,7 +354,7 @@ function amistad(
     badge: `${occasion.emoji} para ti`,
     intro:
       "Hay personas que no llegan por casualidad a nuestras vidas; llegan para quedarse como un refugio.",
-    phrases: buildStory(AMISTAD_SLOTS, index, name, occasion.itemName),
+    phrases: buildStory(AMISTAD_SLOTS, index, name, occasion),
     finalTitle: `${name}, personas como tú hacen que este viaje valga la pena.`,
     finalMessage:
       "Que la vida te devuelva siempre toda la luz, alegría y bondad que entregas a los demás.",
