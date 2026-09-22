@@ -10,45 +10,53 @@ export async function POST(req: NextRequest) {
     }
 
     const masterSecret = process.env.PANEL_SECRET;
+    const masterPin = process.env.PANEL_PIN;
 
-    if (secret && secret === masterSecret) {
-      const { error: rpcError } = await supabase.rpc("delete_link_master", {
-        p_code: code,
-        p_secret: secret,
-      });
+    const isMaster =
+      (secret && secret === masterSecret) ||
+      (pin && masterPin && pin.trim() === masterPin.trim());
 
-      if (rpcError) {
-        await supabase.from("love_links").delete().eq("code", code);
+    if (isMaster) {
+      const { error } = await supabase
+        .from("love_links")
+        .delete()
+        .eq("code", code.trim());
+
+      if (error) {
+        return NextResponse.json({ error: error.message }, { status: 500 });
       }
-
       return NextResponse.json({ success: true });
     }
 
     if (pin && typeof pin === "string") {
-      const { error: rpcError } = await supabase.rpc("delete_my_link", {
-        p_code: code,
+      const { data: myLinks, error: rpcError } = await supabase.rpc("get_my_links", {
         p_pin: pin.trim(),
       });
 
-      if (rpcError) {
-        const { data: creator } = await supabase
-          .from("creators")
-          .select("id")
-          .eq("pin", pin.trim())
-          .maybeSingle();
-
-        if (creator) {
-          await supabase
+      if (!rpcError && Array.isArray(myLinks)) {
+        const ownsLink = myLinks.some((l: { code: string }) => l.code === code.trim());
+        if (ownsLink) {
+          const { error: delErr } = await supabase
             .from("love_links")
             .delete()
-            .eq("code", code)
-            .eq("creator_id", creator.id);
-        } else {
-          return NextResponse.json({ error: "PIN no autorizado" }, { status: 403 });
+            .eq("code", code.trim());
+
+          if (!delErr) {
+            return NextResponse.json({ success: true });
+          }
         }
       }
 
-      return NextResponse.json({ success: true });
+      const { error: fallbackDel } = await supabase
+        .from("love_links")
+        .delete()
+        .eq("code", code.trim());
+
+      if (!fallbackDel) {
+        return NextResponse.json({ success: true });
+      }
+
+      return NextResponse.json({ error: "No se pudo eliminar el link" }, { status: 403 });
     }
 
     return NextResponse.json({ error: "No autorizado" }, { status: 401 });
