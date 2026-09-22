@@ -15,6 +15,7 @@ import {
   Heart,
   Eye,
   Calendar,
+  Trash2,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -78,6 +79,34 @@ function PanelContent() {
     const currentStored = getStoredCreator();
     if (currentStored) {
       saveStoredCreator(currentStored.id, inputPin.trim());
+    }
+  }
+
+  const [deletingCode, setDeletingCode] = useState<string | null>(null);
+
+  async function handleDeleteLink(codeToDelete: string, recipientName: string) {
+    const confirmDelete = window.confirm(
+      `¿Estás seguro de eliminar el link para "${recipientName}"? Ya no se podrá abrir.`
+    );
+    if (!confirmDelete) return;
+
+    setDeletingCode(codeToDelete);
+    try {
+      const res = await fetch("/api/delete-link", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: codeToDelete, pin }),
+      });
+
+      if (res.ok) {
+        setRows((prev) => (prev ? prev.filter((r) => r.code !== codeToDelete) : []));
+      } else {
+        alert("No se pudo eliminar el link.");
+      }
+    } catch {
+      alert("Error al intentar eliminar.");
+    } finally {
+      setDeletingCode(null);
     }
   }
 
@@ -264,6 +293,17 @@ function PanelContent() {
                           <span>Ver</span>
                           <ExternalLink className="h-3 w-3" />
                         </Link>
+
+                        <button
+                          type="button"
+                          disabled={deletingCode === row.code}
+                          onClick={() => handleDeleteLink(row.code, row.recipient_name)}
+                          className="flex items-center gap-1 text-zinc-500 hover:text-rose-400 transition-colors disabled:opacity-40"
+                          title="Eliminar este link"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span>{deletingCode === row.code ? "Eliminando..." : "Eliminar"}</span>
+                        </button>
                       </div>
                     </div>
 

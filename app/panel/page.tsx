@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase";
+import { MasterLinksTable } from "./master-links-table";
 
 export const metadata = {
   title: "Panel privado",
@@ -76,56 +77,7 @@ export default async function PanelPage(
           <h2 className="mb-3 text-sm font-semibold uppercase tracking-wider text-amber-300/80">
             Links generados ({linkRows.length})
           </h2>
-          <div className="overflow-x-auto rounded-2xl border border-white/10">
-            <table className="w-full min-w-[600px] text-left text-sm">
-              <thead className="bg-white/5 text-xs uppercase tracking-wider text-zinc-400">
-                <tr>
-                  <th className="px-4 py-3">Nombre</th>
-                  <th className="px-4 py-3">Tipo</th>
-                  <th className="px-4 py-3">Creado</th>
-                  <th className="px-4 py-3">Abierto</th>
-                  <th className="px-4 py-3">Completó</th>
-                  <th className="px-4 py-3">Visitas</th>
-                </tr>
-              </thead>
-              <tbody>
-                {linkRows.map((row) => (
-                  <tr key={row.code} className="border-t border-white/5">
-                    <td className="px-4 py-3 font-medium text-white">
-                      {row.recipient_name}
-                    </td>
-                    <td className="px-4 py-3 text-zinc-400">
-                      {row.kind === "amistad" ? "🌻 Amistad" : "💛 Amor"}
-                    </td>
-                    <td className="px-4 py-3 text-zinc-500">
-                      {formatDate(row.created_at)}
-                    </td>
-                    <td className="px-4 py-3">
-                      {row.opened_at ? (
-                        <span className="text-emerald-400">
-                          ✓ {formatDate(row.opened_at)}
-                        </span>
-                      ) : (
-                        <span className="text-zinc-600">Sin abrir</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3">
-                      {row.completed_at ? (
-                        <span className="text-emerald-400">
-                          ✓ {formatDate(row.completed_at)}
-                        </span>
-                      ) : (
-                        <span className="text-zinc-600">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-zinc-400">
-                      {row.open_count}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <MasterLinksTable initialLinks={linkRows} secretKey={key} />
         </section>
 
         <section>
