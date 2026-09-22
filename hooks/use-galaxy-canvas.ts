@@ -6,6 +6,8 @@ import { MEMORY_STARS, CONSTELLATIONS } from "@/data/memories";
 import { createBackgroundStars, renderGalaxy } from "@/lib/galaxy-renderer";
 import { lerp, clamp } from "@/lib/math";
 
+const DISCOVERED_STARS_KEY = "mdt_discovered_stars";
+
 export function useGalaxyCanvas() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [selectedStar, setSelectedStar] = useState<MemoryStar | null>(null);
@@ -14,6 +16,18 @@ export function useGalaxyCanvas() {
   const [isDragging, setIsDragging] = useState(false);
   const [isAudioPlaying, setIsAudioPlaying] = useState(false);
   const [discoveredStars, setDiscoveredStars] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(DISCOVERED_STARS_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (Array.isArray(parsed)) {
+          setDiscoveredStars(parsed);
+        }
+      }
+    } catch {}
+  }, []);
 
   const cameraRef = useRef<ViewportCamera>({
     x: 0,
@@ -39,7 +53,14 @@ export function useGalaxyCanvas() {
 
   const focusStar = useCallback((star: MemoryStar) => {
     setSelectedStar(star);
-    setDiscoveredStars((prev) => (prev.includes(star.id) ? prev : [...prev, star.id]));
+    setDiscoveredStars((prev) => {
+      if (prev.includes(star.id)) return prev;
+      const updated = [...prev, star.id];
+      try {
+        window.localStorage.setItem(DISCOVERED_STARS_KEY, JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
 
     const targetRotY = -Math.atan2(star.x, star.z);
     const targetRotX = 0.1;

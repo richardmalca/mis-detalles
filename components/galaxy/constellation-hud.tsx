@@ -7,6 +7,7 @@ interface ConstellationHudProps {
   constellations: Constellation[];
   memoryStars: MemoryStar[];
   activeConstellationId: string | null;
+  discoveredStars?: string[];
   onSelectConstellation: (id: string | null) => void;
   onSelectStar: (star: MemoryStar) => void;
 }
@@ -15,6 +16,7 @@ export function ConstellationHud({
   constellations,
   memoryStars,
   activeConstellationId,
+  discoveredStars = [],
   onSelectConstellation,
   onSelectStar,
 }: ConstellationHudProps) {
@@ -32,6 +34,8 @@ export function ConstellationHud({
           {constellations.map((c) => {
             const isActive = activeConstellationId === c.id;
             const stars = memoryStars.filter((s) => c.stars.includes(s.id));
+            const discoveredInThis = stars.filter((s) => discoveredStars.includes(s.id)).length;
+            const isCompleted = discoveredInThis === stars.length && stars.length > 0;
 
             return (
               <div
@@ -44,11 +48,21 @@ export function ConstellationHud({
                 onClick={() => onSelectConstellation(isActive ? null : c.id)}
               >
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-semibold text-zinc-100">{c.name}</span>
-                  <span
-                    className="h-2 w-2 rounded-full"
-                    style={{ backgroundColor: c.accentColor }}
-                  />
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs font-semibold text-zinc-100">{c.name}</span>
+                    {isCompleted && (
+                      <span className="text-[10px] text-emerald-400 font-bold">✓</span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[10px] text-zinc-400">
+                      {discoveredInThis}/{stars.length}
+                    </span>
+                    <span
+                      className="h-2 w-2 rounded-full"
+                      style={{ backgroundColor: c.accentColor }}
+                    />
+                  </div>
                 </div>
                 <p className="mt-1 text-[11px] italic text-zinc-400">{c.latinName}</p>
 
@@ -58,19 +72,26 @@ export function ConstellationHud({
                       {c.meaning}
                     </p>
                     <div className="flex flex-wrap gap-1 pt-1.5">
-                      {stars.map((s) => (
-                        <button
-                          key={s.id}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onSelectStar(s);
-                          }}
-                          className="flex items-center gap-1 rounded-md bg-white/10 px-2 py-0.5 text-[10px] text-zinc-200 transition-colors hover:bg-white/20"
-                        >
-                          <Sparkles className="h-2.5 w-2.5 text-amber-300" />
-                          {s.title}
-                        </button>
-                      ))}
+                      {stars.map((s) => {
+                        const isDiscovered = discoveredStars.includes(s.id);
+                        return (
+                          <button
+                            key={s.id}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onSelectStar(s);
+                            }}
+                            className={`flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] transition-colors ${
+                              isDiscovered
+                                ? "bg-amber-400/20 text-amber-200 border border-amber-400/40"
+                                : "bg-white/10 text-zinc-300 hover:bg-white/20"
+                            }`}
+                          >
+                            <Sparkles className={`h-2.5 w-2.5 ${isDiscovered ? "text-amber-300 fill-amber-300" : "text-zinc-400"}`} />
+                            {s.title}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}

@@ -147,6 +147,7 @@ export function GalaxyExperience() {
         constellations={CONSTELLATIONS}
         memoryStars={MEMORY_STARS}
         activeConstellationId={activeConstellationId}
+        discoveredStars={discoveredStars}
         onSelectConstellation={setActiveConstellationId}
         onSelectStar={focusStar}
       />
