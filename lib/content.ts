@@ -19,19 +19,18 @@ function amor(name: string): Omit<ExperienceContent, "occasionLabel"> {
   return {
     badge: "🌼 para ti",
     intro:
-      "No todos los cuerpos del universo fueron hechos para orbitar la misma estrella. Nosotros sí.",
+      "Si alguna vez te has preguntado cómo comenzó todo, esta es la historia de cómo cambiaste mi cielo.",
     phrases: [
-      "Dicen que dos cuerpos con suficiente masa terminan por atraerse, tarde o temprano.",
-      "Que no importa la distancia: la gravedad siempre encuentra la forma de llegar.",
-      "Yo no sé mucho de física, pero sé que desde que apareciste, cambió mi órbita entera.",
-      "Hay flores que solo se abren un día al año, como si supieran que ese día es distinto.",
-      "Hoy el campo se llena de flores amarillas, y aun así, pienso en ti antes que en cualquier flor.",
-      "Si tuviera una sola estrella fugaz para pedir un deseo,",
-      `pediría seguir cruzándome contigo, ${name}, en cada versión de este universo.`,
+      "Capítulo I: En medio de un mundo ruidoso y apresurado, cruzamos miradas por primera vez.",
+      "Capítulo II: No necesité mucho tiempo para entender que tu presencia traía consigo una calma que no conocía.",
+      "Capítulo III: Con cada conversación, con cada risa y cada silencio compartido, fuiste encendiendo rincones de mi vida.",
+      "Capítulo IV: Dicen que las flores amarillas representan la promesa de quedarse, de iluminar y de acompañar siempre.",
+      `Capítulo V: Por eso hoy no quería darte un simple detalle, ${name}; quería regalarte una promesa sincera.`,
+      "Capítulo VI: Que no importa cuántos años pasen ni lo grande que sea el mundo: siempre elegiré caminar a tu lado.",
     ],
-    finalTitle: `${name}, eres la razón por la que este universo tiene sentido.`,
+    finalTitle: `${name}, gracias por ser mi hogar y mi lugar favorito.`,
     finalMessage:
-      "Feliz Día de las Flores Amarillas. Que cada flor amarilla de hoy te recuerde lo especial que eres para mí.",
+      "Feliz 21 de marzo. Que estas flores amarillas te recuerden lo inmensamente especial que eres en mi vida.",
     formPrompt: BASE.formPrompt,
   };
 }
@@ -40,18 +39,18 @@ function amistad(name: string): Omit<ExperienceContent, "occasionLabel"> {
   return {
     badge: "🌻 para ti",
     intro:
-      "Hay personas que aparecen sin avisar, como una estrella fugaz que decides quedarte mirando.",
+      "Hay personas que no llegan por casualidad a nuestras vidas; llegan para quedarse como un refugio.",
     phrases: [
-      "No hacía falta que estuviéramos en el mismo lugar del universo para que esto funcionara.",
-      "Bastó con cruzar órbitas una sola vez para que algo se quedara ahí, dando vueltas.",
-      "Las amistades de verdad no se apagan: solo cambian de forma, como las constelaciones.",
-      "Hoy es el día de las flores amarillas,",
-      `y quiero que sepas, ${name}, que sigues siendo una de las luces que no dejo de mirar.`,
-      "No todos los planetas giran cerca, pero los que importan, siempre encuentran la forma de volver.",
+      "Capítulo I: La vida nos puso en el mismo camino casi sin darnos cuenta, en el momento exacto.",
+      "Capítulo II: Entre tantas idas y vueltas, descubrí en ti a alguien con quien siempre se puede ser transparente.",
+      "Capítulo III: Alguien que celebra mis alegrías, que sostiene mis días difíciles y que nunca pide nada a cambio.",
+      "Capítulo IV: Las flores amarillas hoy simbolizan esa luz incondicional, la lealtad y los lazos que nunca se rompen.",
+      `Capítulo V: Y cuando pienso en gratitud sincera y complicidad verdadera, siempre pienso en ti, ${name}.`,
+      "Capítulo VI: Gracias por cada risa compartida y por demostrarme el valor de una amistad que permanece.",
     ],
-    finalTitle: `${name}, gracias por ser una de las constantes en mi universo.`,
+    finalTitle: `${name}, personas como tú hacen que este viaje valga la pena.`,
     finalMessage:
-      "Feliz Día de las Flores Amarillas. Aquí va tu flor amarilla, de un planeta al tuyo.",
+      "Feliz 21 de marzo. Que la vida te devuelva toda la luz y alegría que siempre entregas.",
     formPrompt: BASE.formPrompt,
   };
 }

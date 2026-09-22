@@ -256,10 +256,21 @@ export function SharedExperience({
                       <AnimatedFlower size={46} delay={step * 0.15} />
                     </motion.div>
 
-                    <div className="relative max-w-xl px-2">
-                      <p className="text-xl sm:text-3xl md:text-4xl font-light leading-relaxed text-white drop-shadow-[0_0_30px_rgba(0,0,0,0.9)] tracking-wide">
-                        “{content.phrases[step - 1]}”
-                      </p>
+                    <div className="relative max-w-xl px-2 flex flex-col items-center gap-3">
+                      {content.phrases[step - 1].startsWith("Capítulo") ? (
+                        <>
+                          <span className="text-[11px] sm:text-xs uppercase tracking-[0.25em] font-semibold text-amber-300/90 drop-shadow">
+                            {content.phrases[step - 1].split(":")[0]}
+                          </span>
+                          <p className="text-xl sm:text-3xl md:text-4xl font-light leading-relaxed text-white drop-shadow-[0_0_30px_rgba(0,0,0,0.9)] tracking-wide">
+                            {content.phrases[step - 1].split(":").slice(1).join(":").trim()}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-xl sm:text-3xl md:text-4xl font-light leading-relaxed text-white drop-shadow-[0_0_30px_rgba(0,0,0,0.9)] tracking-wide">
+                          “{content.phrases[step - 1]}”
+                        </p>
+                      )}
                     </div>
 
                     <div className="flex items-center gap-3 pt-4">
