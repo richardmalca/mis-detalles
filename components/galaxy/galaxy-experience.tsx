@@ -79,29 +79,22 @@ export function GalaxyExperience() {
 
       const masterGain = ctx.createGain();
       masterGain.gain.setValueAtTime(0.01, ctx.currentTime);
-      masterGain.gain.exponentialRampToValueAtTime(0.9, ctx.currentTime + 1.2);
+      masterGain.gain.exponentialRampToValueAtTime(0.85, ctx.currentTime + 1.2);
       masterGain.connect(ctx.destination);
       masterGainRef.current = masterGain;
 
-      const warmPad = ctx.createOscillator();
-      const padGain = ctx.createGain();
-      warmPad.type = "triangle";
-      warmPad.frequency.setValueAtTime(220, ctx.currentTime);
-      padGain.gain.setValueAtTime(0.012, ctx.currentTime);
-      warmPad.connect(padGain);
-      padGain.connect(masterGain);
-      warmPad.start();
-
       playHarmonicChime(ctx, masterGain);
       setTimeout(() => {
-        if (audioContextRef.current) playHarmonicChime(ctx, masterGain);
+        if (audioContextRef.current && masterGainRef.current) {
+          playHarmonicChime(audioContextRef.current, masterGainRef.current);
+        }
       }, 700);
 
       chimeIntervalRef.current = window.setInterval(() => {
-        if (audioContextRef.current) {
-          playHarmonicChime(ctx, masterGain);
+        if (audioContextRef.current && masterGainRef.current) {
+          playHarmonicChime(audioContextRef.current, masterGainRef.current);
         }
-      }, 2200);
+      }, 2400);
 
       setIsAudioPlaying(true);
     }
