@@ -186,18 +186,22 @@ export function useCosmicAudio(options?: { storageKey?: string; autoStartIfSaved
 
     const handleUserGesture = () => {
       if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
-        audioCtxRef.current.resume();
+        audioCtxRef.current.resume().then(() => {
+          if (userWantsAudioRef.current) setIsPlaying(true);
+        }).catch(() => {});
       } else if (userWantsAudioRef.current && !masterGainRef.current) {
         internalStart();
       }
     };
 
+    window.addEventListener("pointerdown", handleUserGesture, { passive: true });
     window.addEventListener("touchstart", handleUserGesture, { passive: true });
     window.addEventListener("touchend", handleUserGesture, { passive: true });
     window.addEventListener("click", handleUserGesture, { passive: true });
 
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("pointerdown", handleUserGesture);
       window.removeEventListener("touchstart", handleUserGesture);
       window.removeEventListener("touchend", handleUserGesture);
       window.removeEventListener("click", handleUserGesture);
