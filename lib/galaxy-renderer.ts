@@ -35,6 +35,16 @@ export function createBackgroundStars(count: number = 450): BackgroundStar[] {
   return stars;
 }
 
+export interface ShootingStar {
+  x: number;
+  y: number;
+  length: number;
+  speed: number;
+  angle: number;
+  alpha: number;
+  color: string;
+}
+
 export function renderGalaxy(
   ctx: CanvasRenderingContext2D,
   width: number,
@@ -45,7 +55,8 @@ export function renderGalaxy(
   memoryStars: MemoryStar[],
   constellations: Constellation[],
   hoveredStarId: string | null,
-  activeConstellationId: string | null
+  activeConstellationId: string | null,
+  discoveredStars: string[] = []
 ): { projectedStars: { star: MemoryStar; screenX: number; screenY: number; radius: number }[] } {
   ctx.clearRect(0, 0, width, height);
 
@@ -83,10 +94,8 @@ export function renderGalaxy(
     if (sx < -20 || sx > width + 20 || sy < -20 || sy > height + 20) continue;
 
     const twinkle = Math.sin(time * bgStar.twinkleSpeed + bgStar.twinklePhase) * 0.35 + 0.65;
-    const alpha = bgStar.baseAlpha * proj.alpha * twinkle;
-
     ctx.save();
-    ctx.globalAlpha = Math.max(0.1, Math.min(alpha, 1));
+    ctx.globalAlpha = Math.max(0.05, Math.min(bgStar.baseAlpha * proj.alpha * twinkle, 1));
     ctx.fillStyle = bgStar.color;
     ctx.beginPath();
     ctx.arc(sx, sy, bgStar.size * proj.scale, 0, Math.PI * 2);
@@ -123,9 +132,40 @@ export function renderGalaxy(
     starMap.set(star.id, { x: sx, y: sy, alpha: proj.alpha });
   }
 
+  const activeConstellation = constellations.find((c) => c.id === activeConstellationId);
+  if (activeConstellation) {
+    let sumX = 0;
+    let sumY = 0;
+    let count = 0;
+    for (const sid of activeConstellation.stars) {
+      const pos = starMap.get(sid);
+      if (pos) {
+        sumX += pos.x;
+        sumY += pos.y;
+        count++;
+      }
+    }
+    if (count > 0) {
+      const midX = sumX / count;
+      const midY = sumY / count;
+      const pulseNeb = Math.sin(time * 1.5) * 15 + 160;
+      const cGrad = ctx.createRadialGradient(midX, midY, 10, midX, midY, pulseNeb * 1.6);
+      cGrad.addColorStop(0, activeConstellation.color.replace("0.45", "0.22"));
+      cGrad.addColorStop(0.5, activeConstellation.color.replace("0.45", "0.08"));
+      cGrad.addColorStop(1, "transparent");
+      ctx.save();
+      ctx.fillStyle = cGrad;
+      ctx.beginPath();
+      ctx.arc(midX, midY, pulseNeb * 1.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    }
+  }
+
   for (const constellation of constellations) {
     const isFocused = activeConstellationId === constellation.id;
     const isAnyActive = Boolean(activeConstellationId);
+    const isCompleted = constellation.stars.every((sid) => discoveredStars.includes(sid));
 
     ctx.save();
     ctx.beginPath();
@@ -145,11 +185,18 @@ export function renderGalaxy(
 
     if (isFocused) {
       ctx.strokeStyle = constellation.accentColor;
-      ctx.lineWidth = 2.2;
+      ctx.lineWidth = 2.4;
       ctx.shadowColor = constellation.accentColor;
-      ctx.shadowBlur = 14;
-      ctx.setLineDash([6, 6]);
-      ctx.lineDashOffset = -time * 15;
+      ctx.shadowBlur = 18;
+      ctx.setLineDash([7, 5]);
+      ctx.lineDashOffset = -time * 18;
+    } else if (isCompleted) {
+      ctx.strokeStyle = constellation.accentColor;
+      ctx.lineWidth = 1.6;
+      ctx.shadowColor = constellation.accentColor;
+      ctx.shadowBlur = 10;
+      ctx.setLineDash([4, 3]);
+      ctx.lineDashOffset = -time * 6;
     } else if (isAnyActive) {
       ctx.strokeStyle = "rgba(255, 255, 255, 0.07)";
       ctx.lineWidth = 1;
@@ -162,22 +209,100 @@ export function renderGalaxy(
 
     ctx.stroke();
     ctx.restore();
+
+    if (isFocused || isCompleted) {
+      const starCoords: { x: number; y: number }[] = [];
+      for (const sid of constellation.stars) {
+        const p = starMap.get(sid);
+        if (p) starCoords.push(p);
+      }
+
+      if (starCoords.length > 1) {
+        const segCount = starCoords.length - 1;
+        const speed = isFocused ? 0.35 : 0.2;
+        const progress = (time * speed) % segCount;
+        const segIndex = Math.floor(progress);
+        const segFraction = progress - segIndex;
+
+        const p1 = starCoords[segIndex];
+        const p2 = starCoords[segIndex + 1];
+
+        if (p1 && p2) {
+          const cometX = p1.x + (p2.x - p1.x) * segFraction;
+          const cometY = p1.y + (p2.y - p1.y) * segFraction;
+
+          ctx.save();
+          ctx.shadowColor = constellation.accentColor;
+          ctx.shadowBlur = 14;
+          ctx.fillStyle = "#ffffff";
+          ctx.beginPath();
+          ctx.arc(cometX, cometY, isFocused ? 3.5 : 2.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          const trailGrad = ctx.createRadialGradient(cometX, cometY, 1, cometX, cometY, 12);
+          trailGrad.addColorStop(0, constellation.accentColor);
+          trailGrad.addColorStop(1, "transparent");
+          ctx.fillStyle = trailGrad;
+          ctx.beginPath();
+          ctx.arc(cometX, cometY, 12, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+    }
+  }
+
+  const shootingStarPeriod = 7;
+  const shootingPhase = (time % shootingStarPeriod) / shootingStarPeriod;
+  if (shootingPhase < 0.22) {
+    const progress = shootingPhase / 0.22;
+    const startX = width * 0.2 + (Math.sin(Math.floor(time / shootingStarPeriod)) * 100);
+    const startY = height * 0.1;
+    const shootDist = Math.min(width, height) * 0.45;
+    const currX = startX + Math.cos(Math.PI / 4) * shootDist * progress;
+    const currY = startY + Math.sin(Math.PI / 4) * shootDist * progress;
+    const tailLen = 65 * (1 - progress * 0.3);
+
+    const tailX = currX - Math.cos(Math.PI / 4) * tailLen;
+    const tailY = currY - Math.sin(Math.PI / 4) * tailLen;
+
+    ctx.save();
+    const grad = ctx.createLinearGradient(tailX, tailY, currX, currY);
+    grad.addColorStop(0, "transparent");
+    grad.addColorStop(0.7, "rgba(251, 191, 36, 0.4)");
+    grad.addColorStop(1, "#ffffff");
+    ctx.strokeStyle = grad;
+    ctx.lineWidth = 1.8;
+    ctx.beginPath();
+    ctx.moveTo(tailX, tailY);
+    ctx.lineTo(currX, currY);
+    ctx.stroke();
+
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "#fef08a";
+    ctx.shadowBlur = 10;
+    ctx.beginPath();
+    ctx.arc(currX, currY, 1.8, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
   }
 
   for (const item of projectedMemoryStars) {
-    const { star, screenX, screenY, radius, alpha } = item;
+    const { star, screenX, screenY, radius } = item;
     const isHovered = hoveredStarId === star.id;
     const isInActiveConstellation =
       activeConstellationId && star.constellationId === activeConstellationId;
+    const isDiscovered = discoveredStars.includes(star.id);
 
     const pulse = Math.sin(time * star.pulseSpeed) * 0.35 + 1;
     const actualRadius = (isHovered ? radius * 1.6 : radius) * (isInActiveConstellation ? 1.3 : 1);
 
     ctx.save();
 
-    const haloRadius = actualRadius * (isHovered ? 5.5 : 3.8) * pulse;
-    const haloGrad = ctx.createRadialGradient(screenX, screenY, actualRadius * 0.5, screenX, screenY, haloRadius);
-    haloGrad.addColorStop(0, star.glowColor);
+    const haloMult = isHovered ? 5.8 : (isDiscovered ? 4.6 : 3.6);
+    const haloRadius = actualRadius * haloMult * pulse;
+    const haloGrad = ctx.createRadialGradient(screenX, screenY, actualRadius * 0.4, screenX, screenY, haloRadius);
+    haloGrad.addColorStop(0, isDiscovered ? "#fbbf24" : star.glowColor);
     haloGrad.addColorStop(1, "transparent");
 
     ctx.fillStyle = haloGrad;
@@ -185,22 +310,22 @@ export function renderGalaxy(
     ctx.arc(screenX, screenY, haloRadius, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.fillStyle = isHovered ? "#ffffff" : star.color;
-    ctx.shadowColor = star.color;
-    ctx.shadowBlur = isHovered ? 24 : 14;
+    ctx.fillStyle = isHovered ? "#ffffff" : (isDiscovered ? "#fef08a" : star.color);
+    ctx.shadowColor = isDiscovered ? "#fbbf24" : star.color;
+    ctx.shadowBlur = isHovered ? 26 : (isDiscovered ? 18 : 12);
     ctx.beginPath();
     ctx.arc(screenX, screenY, actualRadius, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = "#ffffff";
     ctx.beginPath();
-    ctx.arc(screenX, screenY, actualRadius * 0.5, 0, Math.PI * 2);
+    ctx.arc(screenX, screenY, actualRadius * 0.52, 0, Math.PI * 2);
     ctx.fill();
 
     if (isHovered || isInActiveConstellation) {
       ctx.shadowBlur = 0;
       ctx.font = "600 13px system-ui, -apple-system, sans-serif";
-      const text = star.title;
+      const text = isDiscovered ? `✓ ${star.title}` : star.title;
       const metrics = ctx.measureText(text);
       const paddingX = 10;
       const paddingY = 5;
@@ -210,7 +335,7 @@ export function renderGalaxy(
       const tagY = screenY - actualRadius - 28;
 
       ctx.fillStyle = "rgba(9, 9, 11, 0.88)";
-      ctx.strokeStyle = isHovered ? star.color : "rgba(255, 255, 255, 0.25)";
+      ctx.strokeStyle = isHovered ? (isDiscovered ? "#fbbf24" : star.color) : "rgba(255, 255, 255, 0.25)";
       ctx.lineWidth = 1;
 
       ctx.beginPath();
@@ -218,7 +343,7 @@ export function renderGalaxy(
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = "#f4f4f5";
+      ctx.fillStyle = isDiscovered ? "#fef08a" : "#f4f4f5";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillText(text, screenX, tagY + tagHeight / 2);

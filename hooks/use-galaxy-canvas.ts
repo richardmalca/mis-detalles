@@ -136,7 +136,8 @@ export function useGalaxyCanvas() {
         MEMORY_STARS,
         CONSTELLATIONS,
         hoveredStarId,
-        activeConstellationId
+        activeConstellationId,
+        discoveredStars
       );
 
       projectedStarsRef.current = renderResult.projectedStars;
@@ -149,7 +150,7 @@ export function useGalaxyCanvas() {
       window.removeEventListener("resize", handleResize);
       cancelAnimationFrame(animationFrameId);
     };
-  }, [hoveredStarId, activeConstellationId]);
+  }, [hoveredStarId, activeConstellationId, discoveredStars]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
     isMouseDownRef.current = true;

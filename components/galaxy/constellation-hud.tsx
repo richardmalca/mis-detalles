@@ -67,11 +67,11 @@ export function ConstellationHud({
                 <p className="mt-1 text-[11px] italic text-zinc-400">{c.latinName}</p>
 
                 {isActive && (
-                  <div className="mt-2.5 space-y-1 border-t border-white/10 pt-2">
+                  <div className="mt-2.5 space-y-2 border-t border-white/10 pt-2">
                     <p className="text-[11px] text-zinc-300 font-light leading-relaxed">
                       {c.meaning}
                     </p>
-                    <div className="flex flex-wrap gap-1 pt-1.5">
+                    <div className="flex flex-wrap gap-1 pt-1">
                       {stars.map((s) => {
                         const isDiscovered = discoveredStars.includes(s.id);
                         return (
@@ -83,7 +83,7 @@ export function ConstellationHud({
                             }}
                             className={`flex items-center gap-1 rounded-md px-2 py-0.5 text-[10px] transition-colors ${
                               isDiscovered
-                                ? "bg-amber-400/20 text-amber-200 border border-amber-400/40"
+                                ? "bg-amber-400/20 text-amber-200 border border-amber-400/40 shadow-[0_0_10px_rgba(251,191,36,0.15)]"
                                 : "bg-white/10 text-zinc-300 hover:bg-white/20"
                             }`}
                           >
