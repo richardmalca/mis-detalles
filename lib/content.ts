@@ -11,7 +11,7 @@ export type ExperienceContent = {
 };
 
 const BASE = {
-  occasionLabel: "Día del Amor y la Amistad · 21 de septiembre",
+  occasionLabel: "Día de las Flores Amarillas · 21 de marzo",
   formPrompt: "Si quieres, déjame algo aquí (solo se guarda, nadie más lo lee):",
 };
 
@@ -25,13 +25,13 @@ function amor(name: string): Omit<ExperienceContent, "occasionLabel"> {
       "Que no importa la distancia: la gravedad siempre encuentra la forma de llegar.",
       "Yo no sé mucho de física, pero sé que desde que apareciste, cambió mi órbita entera.",
       "Hay flores que solo se abren un día al año, como si supieran que ese día es distinto.",
-      "Hoy el campo se llena de amarillo, y aun así, pienso en ti antes que en cualquier flor.",
+      "Hoy el campo se llena de flores amarillas, y aun así, pienso en ti antes que en cualquier flor.",
       "Si tuviera una sola estrella fugaz para pedir un deseo,",
       `pediría seguir cruzándome contigo, ${name}, en cada versión de este universo.`,
     ],
     finalTitle: `${name}, eres la razón por la que este universo tiene sentido.`,
     finalMessage:
-      "Feliz Día del Amor y la Amistad. Que cada flor amarilla de hoy te recuerde lo que significas para mí.",
+      "Feliz Día de las Flores Amarillas. Que cada flor amarilla de hoy te recuerde lo especial que eres para mí.",
     formPrompt: BASE.formPrompt,
   };
 }
@@ -51,7 +51,7 @@ function amistad(name: string): Omit<ExperienceContent, "occasionLabel"> {
     ],
     finalTitle: `${name}, gracias por ser una de las constantes en mi universo.`,
     finalMessage:
-      "Feliz Día del Amor y la Amistad. Aquí va tu flor amarilla, de un planeta al tuyo.",
+      "Feliz Día de las Flores Amarillas. Aquí va tu flor amarilla, de un planeta al tuyo.",
     formPrompt: BASE.formPrompt,
   };
 }
