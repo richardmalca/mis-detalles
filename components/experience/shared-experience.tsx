@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { getExperienceContent, ExperienceKind } from "@/lib/content";
 import { supabase } from "@/lib/supabase";
@@ -37,7 +37,11 @@ export function SharedExperience({
   const [opened, setOpened] = useState(false);
   const [step, setStep] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
-  const content = getExperienceContent(kind, recipientName, occasionId);
+  const content = useMemo(
+    () => getExperienceContent(kind, recipientName, occasionId),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
   const hasMarkedComplete = useRef(false);
   const autoPlayTimer = useRef<number | null>(null);
 

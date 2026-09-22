@@ -17,15 +17,6 @@ const FORM_PROMPT = "Déjame unas palabras con cariño:";
 
 const STORY_COUNT = 60;
 
-function hashString(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash |= 0;
-  }
-  return Math.abs(hash);
-}
-
 type StorySlots = {
   openers: string[];
   developments: string[];
@@ -262,11 +253,15 @@ const AMISTAD_SLOTS: StorySlots = {
   ],
 };
 
+function randomStoryIndex(): number {
+  return Math.floor(Math.random() * STORY_COUNT);
+}
+
 function amor(
   name: string,
   occasion: Occasion
 ): Omit<ExperienceContent, "occasionLabel"> {
-  const index = hashString(name.toLowerCase()) % STORY_COUNT;
+  const index = randomStoryIndex();
   return {
     badge: `${occasion.emoji} para ti`,
     intro:
@@ -282,7 +277,7 @@ function amistad(
   name: string,
   occasion: Occasion
 ): Omit<ExperienceContent, "occasionLabel"> {
-  const index = hashString(name.toLowerCase()) % STORY_COUNT;
+  const index = randomStoryIndex();
   return {
     badge: `${occasion.emoji} para ti`,
     intro:
