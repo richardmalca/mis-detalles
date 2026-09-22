@@ -12,6 +12,9 @@ interface LoveLinkData {
   kind?: string;
   recipient_name?: string;
   occasion_id?: string;
+  mode?: string;
+  custom_memory?: string | null;
+  custom_final?: string | null;
 }
 
 export async function generateMetadata({
@@ -89,6 +92,9 @@ export default async function ExperienciaPage({ params }: ExperienciaPageProps) 
         kind={kind}
         code={code}
         occasionId={occasionId}
+        mode={linkData.mode}
+        customMemory={linkData.custom_memory}
+        customFinal={linkData.custom_final}
       />
     );
   } catch {

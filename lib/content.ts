@@ -32,12 +32,14 @@ function buildStory(
   slots: StorySlots,
   index: number,
   name: string,
-  occasion: Occasion
+  occasion: Occasion,
+  customMemory?: string | null
 ): string[] {
   const i = index % STORY_COUNT;
   return [
     slots.openers[i % slots.openers.length],
-    slots.developments[(i * 7 + 3) % slots.developments.length],
+    customMemory?.trim() ||
+      slots.developments[(i * 7 + 3) % slots.developments.length],
     slots.secondDevelopments[(i * 23 + 7) % slots.secondDevelopments.length],
     slots.realizations[(i * 13 + 5) % slots.realizations.length],
     slots.flowerLines[(i * 11 + 2) % slots.flowerLines.length](occasion),
@@ -331,32 +333,39 @@ function randomStoryIndex(): number {
 
 function amor(
   name: string,
-  occasion: Occasion
+  occasion: Occasion,
+  customMemory?: string | null,
+  customFinal?: string | null
 ): Omit<ExperienceContent, "occasionLabel"> {
   const index = randomStoryIndex();
   return {
     badge: `${occasion.emoji} para ti`,
     intro:
       "Si alguna vez te has preguntado cómo comenzó todo, esta es la historia de cómo cambiaste mi cielo.",
-    phrases: buildStory(AMOR_SLOTS, index, name, occasion),
+    phrases: buildStory(AMOR_SLOTS, index, name, occasion, customMemory),
     finalTitle: `${name}, gracias por ser mi hogar y mi lugar favorito.`,
-    finalMessage: `Que ${occasion.demArticle.toLowerCase()} ${occasion.itemName} te recuerden siempre lo inmensamente especial que eres en mi vida.`,
+    finalMessage:
+      customFinal?.trim() ||
+      `Que ${occasion.demArticle.toLowerCase()} ${occasion.itemName} te recuerden siempre lo inmensamente especial que eres en mi vida.`,
     formPrompt: FORM_PROMPT,
   };
 }
 
 function amistad(
   name: string,
-  occasion: Occasion
+  occasion: Occasion,
+  customMemory?: string | null,
+  customFinal?: string | null
 ): Omit<ExperienceContent, "occasionLabel"> {
   const index = randomStoryIndex();
   return {
     badge: `${occasion.emoji} para ti`,
     intro:
       "Hay personas que no llegan por casualidad a nuestras vidas; llegan para quedarse como un refugio.",
-    phrases: buildStory(AMISTAD_SLOTS, index, name, occasion),
+    phrases: buildStory(AMISTAD_SLOTS, index, name, occasion, customMemory),
     finalTitle: `${name}, personas como tú hacen que este viaje valga la pena.`,
     finalMessage:
+      customFinal?.trim() ||
       "Que la vida te devuelva siempre toda la luz, alegría y bondad que entregas a los demás.",
     formPrompt: FORM_PROMPT,
   };
@@ -365,11 +374,19 @@ function amistad(
 export function getExperienceContent(
   kind: ExperienceKind,
   name: string,
-  occasionId?: string | null
+  occasionId?: string | null,
+  mode?: string | null,
+  customMemory?: string | null,
+  customFinal?: string | null
 ): ExperienceContent {
   const safeName = name.trim() || "ti";
   const occasion = getOccasionById(occasionId);
+  const useCustom = mode === "custom";
+  const memory = useCustom ? customMemory : null;
+  const final = useCustom ? customFinal : null;
   const content =
-    kind === "amistad" ? amistad(safeName, occasion) : amor(safeName, occasion);
+    kind === "amistad"
+      ? amistad(safeName, occasion, memory, final)
+      : amor(safeName, occasion, memory, final);
   return { ...content, occasionLabel: occasion.label };
 }

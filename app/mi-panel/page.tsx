@@ -16,8 +16,14 @@ import {
   Eye,
   Calendar,
   Trash2,
+  Pencil,
+  Dices,
+  PenLine,
+  X,
 } from "lucide-react";
 import Link from "next/link";
+
+const CUSTOM_FIELD_LIMIT = 200;
 
 interface LinkRow {
   code: string;
@@ -27,6 +33,9 @@ interface LinkRow {
   opened_at: string | null;
   completed_at: string | null;
   open_count: number;
+  mode: string;
+  custom_memory: string | null;
+  custom_final: string | null;
 }
 
 function formatDate(value: string | null) {
@@ -88,6 +97,58 @@ function PanelContent() {
   } | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+
+  const [editModal, setEditModal] = useState<LinkRow | null>(null);
+  const [editMode, setEditMode] = useState<"auto" | "custom">("auto");
+  const [editMemory, setEditMemory] = useState("");
+  const [editFinal, setEditFinal] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
+
+  function openEditModal(row: LinkRow) {
+    setEditModal(row);
+    setEditMode(row.mode === "custom" ? "custom" : "auto");
+    setEditMemory(row.custom_memory || "");
+    setEditFinal(row.custom_final || "");
+    setEditError(null);
+  }
+
+  async function confirmEdit() {
+    if (!editModal) return;
+    setIsSaving(true);
+    setEditError(null);
+
+    const { data, error } = await supabase.rpc("update_my_link", {
+      p_code: editModal.code,
+      p_pin: pin.trim(),
+      p_mode: editMode,
+      p_custom_memory: editMode === "custom" ? editMemory.trim() : null,
+      p_custom_final: editMode === "custom" ? editFinal.trim() : null,
+    });
+
+    if (error || !data) {
+      setEditError("No se pudo guardar el cambio.");
+      setIsSaving(false);
+      return;
+    }
+
+    setRows((prev) =>
+      prev
+        ? prev.map((r) =>
+            r.code === editModal.code
+              ? {
+                  ...r,
+                  mode: editMode,
+                  custom_memory: editMode === "custom" ? editMemory.trim() : null,
+                  custom_final: editMode === "custom" ? editFinal.trim() : null,
+                }
+              : r
+          )
+        : prev
+    );
+    setIsSaving(false);
+    setEditModal(null);
+  }
 
   async function confirmDelete() {
     if (!deleteModal) return;
@@ -262,6 +323,23 @@ function PanelContent() {
                         >
                           {row.kind === "amor" ? "💛 Amor" : "🌻 Amistad"}
                         </span>
+                        <span
+                          className={`flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold border ${
+                            row.mode === "custom"
+                              ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-300"
+                              : "border-sky-500/30 bg-sky-500/10 text-sky-300"
+                          }`}
+                        >
+                          {row.mode === "custom" ? (
+                            <>
+                              <PenLine className="h-3 w-3" /> Personalizado
+                            </>
+                          ) : (
+                            <>
+                              <Dices className="h-3 w-3" /> Automático
+                            </>
+                          )}
+                        </span>
                       </div>
 
                       <div className="flex flex-wrap items-center gap-1.5">
@@ -303,6 +381,16 @@ function PanelContent() {
                           <span>Ver</span>
                           <ExternalLink className="h-3 w-3" />
                         </Link>
+
+                        <button
+                          type="button"
+                          onClick={() => openEditModal(row)}
+                          className="flex items-center gap-1 text-zinc-500 hover:text-violet-300 transition-colors"
+                          title="Editar automático/personalizado"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                          <span>Editar</span>
+                        </button>
 
                         <button
                           type="button"
@@ -374,6 +462,117 @@ function PanelContent() {
                     className="flex-1 rounded-xl bg-rose-600 py-2.5 text-xs font-bold text-white shadow-lg shadow-rose-600/30 hover:bg-rose-500 active:scale-95 disabled:opacity-50 transition-all"
                   >
                     {isDeleting ? "Eliminando..." : "Sí, eliminar"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {editModal && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm animate-in fade-in">
+              <div className="w-full max-w-md rounded-3xl border border-violet-500/30 bg-zinc-950 p-6 shadow-2xl space-y-4 max-h-[85dvh] overflow-y-auto">
+                <div className="flex items-center justify-between">
+                  <h3 className="text-base font-bold text-white">
+                    Editar historia de {editModal.recipient_name}
+                  </h3>
+                  <button
+                    type="button"
+                    onClick={() => setEditModal(null)}
+                    className="text-zinc-500 hover:text-white"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setEditMode("auto")}
+                    className={`flex items-center justify-center gap-2 rounded-xl border p-2.5 text-xs font-semibold transition-all ${
+                      editMode === "auto"
+                        ? "border-sky-500/50 bg-sky-500/15 text-sky-300"
+                        : "border-white/5 bg-white/[0.02] text-zinc-400 hover:border-white/20"
+                    }`}
+                  >
+                    <Dices className="h-3.5 w-3.5" />
+                    Automático
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setEditMode("custom")}
+                    className={`flex items-center justify-center gap-2 rounded-xl border p-2.5 text-xs font-semibold transition-all ${
+                      editMode === "custom"
+                        ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-300"
+                        : "border-white/5 bg-white/[0.02] text-zinc-400 hover:border-white/20"
+                    }`}
+                  >
+                    <PenLine className="h-3.5 w-3.5" />
+                    Personalizado
+                  </button>
+                </div>
+
+                {editMode === "custom" && (
+                  <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-zinc-300">
+                          Un recuerdo específico
+                        </label>
+                        <span className="text-[10px] text-zinc-500">
+                          {editMemory.length}/{CUSTOM_FIELD_LIMIT}
+                        </span>
+                      </div>
+                      <textarea
+                        value={editMemory}
+                        maxLength={CUSTOM_FIELD_LIMIT}
+                        onChange={(e) => setEditMemory(e.target.value)}
+                        rows={2}
+                        className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-zinc-100 outline-none focus:border-emerald-400/60"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1">
+                      <div className="flex items-center justify-between">
+                        <label className="text-xs font-semibold text-zinc-300">
+                          Tu mensaje final
+                        </label>
+                        <span className="text-[10px] text-zinc-500">
+                          {editFinal.length}/{CUSTOM_FIELD_LIMIT}
+                        </span>
+                      </div>
+                      <textarea
+                        value={editFinal}
+                        maxLength={CUSTOM_FIELD_LIMIT}
+                        onChange={(e) => setEditFinal(e.target.value)}
+                        rows={2}
+                        className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-zinc-100 outline-none focus:border-emerald-400/60"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {editError && (
+                  <p className="text-xs text-rose-400 bg-rose-500/10 p-2 rounded-xl border border-rose-500/20">
+                    {editError}
+                  </p>
+                )}
+
+                <div className="flex gap-2.5 pt-1">
+                  <button
+                    type="button"
+                    disabled={isSaving}
+                    onClick={() => setEditModal(null)}
+                    className="flex-1 rounded-xl border border-white/10 bg-white/5 py-2.5 text-xs font-semibold text-zinc-300 hover:bg-white/10 active:scale-95 transition-all"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSaving}
+                    onClick={confirmEdit}
+                    className="flex-1 rounded-xl bg-violet-600 py-2.5 text-xs font-bold text-white shadow-lg shadow-violet-600/30 hover:bg-violet-500 active:scale-95 disabled:opacity-50 transition-all"
+                  >
+                    {isSaving ? "Guardando..." : "Guardar cambios"}
                   </button>
                 </div>
               </div>

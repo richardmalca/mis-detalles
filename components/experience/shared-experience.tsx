@@ -28,17 +28,31 @@ export function SharedExperience({
   kind,
   code,
   occasionId,
+  mode,
+  customMemory,
+  customFinal,
 }: {
   recipientName: string;
   kind: ExperienceKind;
   code: string;
   occasionId?: string;
+  mode?: string;
+  customMemory?: string | null;
+  customFinal?: string | null;
 }) {
   const [opened, setOpened] = useState(false);
   const [step, setStep] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(false);
   const content = useMemo(
-    () => getExperienceContent(kind, recipientName, occasionId),
+    () =>
+      getExperienceContent(
+        kind,
+        recipientName,
+        occasionId,
+        mode,
+        customMemory,
+        customFinal
+      ),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );

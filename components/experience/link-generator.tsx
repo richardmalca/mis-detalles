@@ -16,12 +16,19 @@ import {
   KeyRound,
   ShieldCheck,
   ArrowRight,
+  Dices,
+  PenLine,
 } from "lucide-react";
 import Link from "next/link";
+
+const CUSTOM_FIELD_LIMIT = 200;
 
 export function LinkGenerator() {
   const [name, setName] = useState("");
   const [kind, setKind] = useState<ExperienceKind>("amor");
+  const [mode, setMode] = useState<"auto" | "custom">("auto");
+  const [customMemory, setCustomMemory] = useState("");
+  const [customFinal, setCustomFinal] = useState("");
   const [link, setLink] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [status, setStatus] = useState<"idle" | "loading" | "error">("idle");
@@ -55,6 +62,9 @@ export function LinkGenerator() {
         p_kind: kind,
         p_creator_id: creator.id,
         p_occasion_id: occasion.id,
+        p_mode: mode,
+        p_custom_memory: mode === "custom" ? customMemory.trim() : null,
+        p_custom_final: mode === "custom" ? customFinal.trim() : null,
       });
 
       if (error || !data) {
@@ -138,6 +148,86 @@ export function LinkGenerator() {
           </button>
         </div>
       </div>
+
+      <div className="flex w-full flex-col gap-1.5">
+        <span className="text-xs font-bold uppercase tracking-wider text-zinc-300">
+          ¿Cómo quieres la historia?
+        </span>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            type="button"
+            onClick={() => setMode("auto")}
+            className={`flex items-center justify-center gap-2 rounded-xl border p-2.5 text-xs font-semibold transition-all ${
+              mode === "auto"
+                ? "border-sky-500/50 bg-sky-500/15 text-sky-300 shadow-md shadow-sky-500/10"
+                : "border-white/5 bg-white/[0.02] text-zinc-400 hover:border-white/20"
+            }`}
+          >
+            <Dices className="h-3.5 w-3.5" />
+            Automático
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setMode("custom")}
+            className={`flex items-center justify-center gap-2 rounded-xl border p-2.5 text-xs font-semibold transition-all ${
+              mode === "custom"
+                ? "border-emerald-500/50 bg-emerald-500/15 text-emerald-300 shadow-md shadow-emerald-500/10"
+                : "border-white/5 bg-white/[0.02] text-zinc-400 hover:border-white/20"
+            }`}
+          >
+            <PenLine className="h-3.5 w-3.5" />
+            Personalizado
+          </button>
+        </div>
+      </div>
+
+      {mode === "custom" && (
+        <div className="flex w-full flex-col gap-3 rounded-2xl border border-emerald-500/20 bg-emerald-500/[0.04] p-4">
+          <p className="text-[11px] leading-relaxed text-zinc-400">
+            Estos dos campos son opcionales, pero si los llenas, siempre van a
+            aparecer en la historia (no se reemplazan al azar).
+          </p>
+
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-zinc-300">
+                Un recuerdo específico
+              </label>
+              <span className="text-[10px] text-zinc-500">
+                {customMemory.length}/{CUSTOM_FIELD_LIMIT}
+              </span>
+            </div>
+            <textarea
+              value={customMemory}
+              maxLength={CUSTOM_FIELD_LIMIT}
+              onChange={(e) => setCustomMemory(e.target.value)}
+              placeholder="Ej. Aquella tarde que nos quedamos hablando hasta tarde en el parque..."
+              rows={2}
+              className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-emerald-400/60 focus:bg-white/[0.08]"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-semibold text-zinc-300">
+                Tu mensaje final
+              </label>
+              <span className="text-[10px] text-zinc-500">
+                {customFinal.length}/{CUSTOM_FIELD_LIMIT}
+              </span>
+            </div>
+            <textarea
+              value={customFinal}
+              maxLength={CUSTOM_FIELD_LIMIT}
+              onChange={(e) => setCustomFinal(e.target.value)}
+              placeholder="Ej. Gracias por ser mi persona favorita en este mundo..."
+              rows={2}
+              className="w-full resize-none rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-600 outline-none focus:border-emerald-400/60 focus:bg-white/[0.08]"
+            />
+          </div>
+        </div>
+      )}
 
       <button
         onClick={handleGenerate}
