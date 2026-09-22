@@ -24,6 +24,7 @@ export function GalaxyExperience() {
     setIsAudioPlaying,
     discoveredStars,
     focusStar,
+    closeModal,
     resetView,
     zoomIn,
     zoomOut,
@@ -162,7 +163,7 @@ export function GalaxyExperience() {
         totalCount={MEMORY_STARS.length}
       />
 
-      <StarDetailModal star={selectedStar} onClose={() => setSelectedStar(null)} />
+      <StarDetailModal star={selectedStar} onClose={closeModal} />
     </div>
   );
 }

@@ -76,6 +76,13 @@ export function useGalaxyCanvas(options?: { enablePinchZoom?: boolean }) {
     autoRotateRef.current = false;
   }, []);
 
+  const closeModal = useCallback(() => {
+    setSelectedStar(null);
+    cameraRef.current.targetRotationX = 0.15;
+    cameraRef.current.targetZoom = 1;
+    autoRotateRef.current = true;
+  }, []);
+
   const resetView = useCallback(() => {
     cameraRef.current.targetX = 0;
     cameraRef.current.targetY = 0;
@@ -280,6 +287,7 @@ export function useGalaxyCanvas(options?: { enablePinchZoom?: boolean }) {
     setIsAudioPlaying,
     discoveredStars,
     focusStar,
+    closeModal,
     resetView,
     zoomIn,
     zoomOut,
