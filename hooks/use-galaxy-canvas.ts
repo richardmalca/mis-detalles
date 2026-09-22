@@ -8,7 +8,8 @@ import { lerp, clamp } from "@/lib/math";
 
 const DISCOVERED_STARS_KEY = "mdt_discovered_stars";
 
-export function useGalaxyCanvas() {
+export function useGalaxyCanvas(options?: { enablePinchZoom?: boolean }) {
+  const enablePinchZoom = options?.enablePinchZoom ?? false;
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const [selectedStar, setSelectedStar] = useState<MemoryStar | null>(null);
   const [hoveredStarId, setHoveredStarId] = useState<string | null>(null);
@@ -50,6 +51,10 @@ export function useGalaxyCanvas() {
   const lastMouseRef = useRef<{ x: number; y: number }>({ x: 0, y: 0 });
   const isMouseDownRef = useRef<boolean>(false);
   const autoRotateRef = useRef<boolean>(true);
+
+  const activePointersRef = useRef<Map<number, { x: number; y: number }>>(new Map());
+  const initialPinchDistRef = useRef<number | null>(null);
+  const initialPinchZoomRef = useRef<number>(1);
 
   const focusStar = useCallback((star: MemoryStar) => {
     setSelectedStar(star);
@@ -153,16 +158,47 @@ export function useGalaxyCanvas() {
   }, [hoveredStarId, activeConstellationId, discoveredStars]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    isMouseDownRef.current = true;
-    setIsDragging(true);
-    lastMouseRef.current = { x: e.clientX, y: e.clientY };
-    pointerPosRef.current = { x: e.clientX, y: e.clientY };
+    activePointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (enablePinchZoom && activePointersRef.current.size === 2) {
+      const points = Array.from(activePointersRef.current.values());
+      initialPinchDistRef.current = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+      initialPinchZoomRef.current = cameraRef.current.targetZoom;
+      isMouseDownRef.current = false;
+      setIsDragging(false);
+      return;
+    }
+
+    if (activePointersRef.current.size === 1) {
+      isMouseDownRef.current = true;
+      setIsDragging(true);
+      lastMouseRef.current = { x: e.clientX, y: e.clientY };
+      pointerPosRef.current = { x: e.clientX, y: e.clientY };
+    }
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
     pointerPosRef.current = { x: e.clientX, y: e.clientY };
+    if (activePointersRef.current.has(e.pointerId)) {
+      activePointersRef.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    }
 
-    if (isMouseDownRef.current) {
+    if (enablePinchZoom && activePointersRef.current.size === 2) {
+      const points = Array.from(activePointersRef.current.values());
+      const dist = Math.hypot(points[0].x - points[1].x, points[0].y - points[1].y);
+
+      if (initialPinchDistRef.current && initialPinchDistRef.current > 10) {
+        const factor = dist / initialPinchDistRef.current;
+        cameraRef.current.targetZoom = clamp(
+          initialPinchZoomRef.current * factor,
+          0.5,
+          2.5
+        );
+      }
+      return;
+    }
+
+    if (isMouseDownRef.current && activePointersRef.current.size === 1) {
       const dx = e.clientX - lastMouseRef.current.x;
       const dy = e.clientY - lastMouseRef.current.y;
 
@@ -192,12 +228,25 @@ export function useGalaxyCanvas() {
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
+    activePointersRef.current.delete(e.pointerId);
+
+    if (activePointersRef.current.size < 2) {
+      initialPinchDistRef.current = null;
+    }
+
+    if (activePointersRef.current.size === 1) {
+      const remaining = activePointersRef.current.values().next().value;
+      if (remaining) {
+        lastMouseRef.current = { x: remaining.x, y: remaining.y };
+      }
+    }
+
     const moved = Math.hypot(
       e.clientX - lastMouseRef.current.x,
       e.clientY - lastMouseRef.current.y
     );
 
-    if (moved < 5) {
+    if (moved < 5 && activePointersRef.current.size === 0) {
       for (const item of projectedStarsRef.current) {
         const dist = Math.hypot(e.clientX - item.screenX, e.clientY - item.screenY);
         if (dist <= item.radius + 18) {
@@ -207,11 +256,14 @@ export function useGalaxyCanvas() {
       }
     }
 
-    isMouseDownRef.current = false;
-    setIsDragging(false);
+    if (activePointersRef.current.size === 0) {
+      isMouseDownRef.current = false;
+      setIsDragging(false);
+    }
   };
 
   const handleWheel = (e: React.WheelEvent) => {
+    if (!enablePinchZoom) return;
     const delta = e.deltaY * -0.001;
     cameraRef.current.targetZoom = clamp(cameraRef.current.targetZoom + delta, 0.5, 2.5);
   };

@@ -31,7 +31,7 @@ export function GalaxyExperience() {
     handlePointerMove,
     handlePointerUp,
     handleWheel,
-  } = useGalaxyCanvas();
+  } = useGalaxyCanvas({ enablePinchZoom: true });
 
   const playHarmonicChime = (ctx: AudioContext, gainNode: GainNode) => {
     const scale = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25, 587.33, 659.25];
