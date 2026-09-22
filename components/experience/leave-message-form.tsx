@@ -76,7 +76,7 @@ export function LeaveMessageForm({ prompt }: { prompt: string }) {
       {status === "error" && (
         <div className="flex items-center gap-2 text-xs text-rose-400">
           <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-          <span>No pudimos guardar el mensaje ahora. Inténtalo luego.</span>
+          <span>Hubo un problema al enviar. Inténtalo de nuevo.</span>
         </div>
       )}
     </form>

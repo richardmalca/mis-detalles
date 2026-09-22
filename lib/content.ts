@@ -12,7 +12,7 @@ export type ExperienceContent = {
 
 const BASE = {
   occasionLabel: "Día de las Flores Amarillas · 21 de marzo",
-  formPrompt: "Si quieres, déjame algo aquí (solo se guarda, nadie más lo lee):",
+  formPrompt: "Déjame unas palabras con cariño:",
 };
 
 function amor(name: string): Omit<ExperienceContent, "occasionLabel"> {
